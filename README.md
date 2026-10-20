@@ -122,6 +122,9 @@ from the command line with `npm run deploy:vercel` (needs `VERCEL_TOKEN`).
 Full walkthrough — env vars, CLI commands, CORS gotchas, troubleshooting:
 **[docs/VERCEL-SPLIT.md](docs/VERCEL-SPLIT.md)**
 
+Every data command calls a real API — the full list, with which ones need a
+key and which are free: **[docs/APIS.md](docs/APIS.md)**
+
 > [!WARNING]
 > **Free tiers sleep.** Render's free web service idles out after ~15 minutes, and a sleeping bot cannot answer WhatsApp messages. Ping `/api/health` every 5 minutes with a free uptime monitor, or take the Starter plan for 24/7.
 

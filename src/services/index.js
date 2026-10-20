@@ -5,6 +5,7 @@ import downloader from './downloader.js'
 import textmaker from './textmaker.js'
 import * as scheduler from './scheduler.js'
 import * as economy from './economy.js'
+import * as content from './content.js'
 import { capabilities } from '../core/registry.js'
 
 /**
@@ -20,6 +21,7 @@ export const services = {
   textmaker,
   scheduler,
   economy,
+  content,
   capabilities
 }
 

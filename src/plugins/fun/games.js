@@ -108,14 +108,27 @@ export default [
     name: 'trivia',
     aliases: ['quiz'],
     category: 'fun',
-    description: 'Answer a trivia question (60 seconds)',
+    description: 'Answer a live trivia question from opentdb (60 seconds)',
     cooldown: 5,
     async execute(ctx) {
-      const question = pick(TRIVIA)
       const key = sessionKey(ctx)
-      sessions.set(key, { type: 'trivia', answer: question.a, expires: Date.now() + 60_000 })
+      let question
 
-      return ctx.reply(`🧠 *TRIVIA*\n\n${question.q}\n\n_You have 60 seconds. Just type your answer._`)
+      try {
+        const live = await ctx.services.content.trivia()
+        question = {
+          text: `${live.question}\n\n${live.options.map((o, i) => `${'ABCD'[i]}. ${o}`).join('\n')}`,
+          answer: [live.correct.toLowerCase()],
+          meta: `${live.category} · ${live.difficulty} · opentdb.com`
+        }
+      } catch {
+        // The API is down: serve a local question and say it is local.
+        const local = pick(TRIVIA)
+        question = { text: local.q, answer: local.a, meta: 'offline question' }
+      }
+
+      sessions.set(key, { type: 'trivia', answer: question.answer, expires: Date.now() + 60_000 })
+      return ctx.reply(`🧠 *TRIVIA*\n\n${question.text}\n\n_${question.meta} — you have 60 seconds. Type the answer._`)
     }
   },
 
@@ -306,37 +319,30 @@ export default [
     name: 'fact',
     aliases: ['funfact', 'didyouknow'],
     category: 'fun',
-    description: 'A random real fact',
+    description: 'A random real fact (uselessfacts API)',
     cooldown: 2,
     async execute(ctx) {
-      const facts = [
-        'A group of flamingos is called a "flamboyance".',
-        'Honey never spoils — 3,000-year-old honey is still edible.',
-        'Octopuses have three hearts and blue blood.',
-        'The Eiffel Tower grows about 15 cm taller in summer due to heat expansion.',
-        'Bananas are berries; strawberries are not.',
-        'There is more computing power in a modern phone than in the Apollo 11 guidance computer.',
-        'Nigeria has over 500 living languages — the highest in Africa.'
-      ]
-      return ctx.reply(`🧠 *Fact*\n\n${pick(facts)}`)
+      try {
+        const { text, source } = await ctx.services.content.fact()
+        return ctx.reply(`🧠 *Fact*\n\n${text}\n\n_${source}_`)
+      } catch {
+        throw new UserError('The fact API is not answering right now. Try again in a minute.')
+      }
     }
   },
 
   {
     name: 'quote',
     category: 'fun',
-    description: 'A quote worth reading',
+    description: 'A quote with its author (zenquotes API)',
     cooldown: 2,
     async execute(ctx) {
-      const quotes = [
-        ['The eye sees only what the mind is prepared to comprehend.', 'Robertson Davies'],
-        ['If you want to go fast, go alone. If you want to go far, go together.', 'African proverb'],
-        ['The measure of intelligence is the ability to change.', 'Albert Einstein'],
-        ['Do not wait to strike till the iron is hot; make it hot by striking.', 'W. B. Yeats'],
-        ['A person who never made a mistake never tried anything new.', 'Marie Curie']
-      ]
-      const [text, author] = pick(quotes)
-      return ctx.reply(`❝ ${text} ❞\n\n— *${author}*`)
+      try {
+        const { text, author } = await ctx.services.content.quote()
+        return ctx.reply(`❝ ${text} ❞\n\n— *${author}*`)
+      } catch {
+        throw new UserError('The quote API is rate-limited right now. Try again in a minute.')
+      }
     }
   },
 
@@ -416,25 +422,15 @@ export default [
     name: 'joke',
     aliases: ['dadjoke', 'pun'],
     category: 'fun',
-    description: 'A joke (real joke API with a local fallback)',
+    description: 'A joke from a real joke API (icanhazdadjoke / official-joke-api)',
     cooldown: 2,
     async execute(ctx) {
       try {
-        const data = await ctx.services.ai.enabled
-          ? null
-          : null
-        if (data) return ctx.reply(data)
+        const { text } = await ctx.services.content.joke()
+        return ctx.reply(`😄 ${text}`)
       } catch {
-        /* fall through to local jokes */
+        throw new UserError('Both joke APIs are unreachable right now. Try again in a minute.')
       }
-      const jokes = [
-        'I told my computer I needed a break. It said: no problem — I will go to sleep.',
-        'Why do programmers prefer dark mode? Because light attracts bugs.',
-        'I would tell you a UDP joke, but you might not get it.',
-        'MyWhatsApp bot has trust issues. It keeps reading every message. 👁️',
-        'There are two hard things in computing: cache invalidation, naming things, and off-by-one errors.'
-      ]
-      return ctx.reply(`😄 ${pick(jokes)}`)
     }
   }
 ]
