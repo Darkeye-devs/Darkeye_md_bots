@@ -1,0 +1,4 @@
+{
+  "_comment": "Set apiBaseUrl to your Render URL to point this site at your bot. No rebuild needed if you change it here and redeploy, or use ?api=https://your-bot.onrender.com once.",
+  "apiBaseUrl": ""
+}

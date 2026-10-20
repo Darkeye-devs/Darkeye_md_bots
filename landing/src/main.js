@@ -5,7 +5,36 @@ import './style.css'
  * Frontend: Vercel (static). Backend: Render (`VITE_API_BASE_URL`).
  */
 
-const API = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000').replace(/\/+$/, '')
+/**
+ * Resolve the backend URL, in priority order:
+ *   1. ?api=https://… in the address bar  (saved, so it survives reloads)
+ *   2. config.json served next to the site (edit without touching code)
+ *   3. VITE_API_BASE_URL from the build environment
+ *   4. localhost, for development
+ * This is why the site still works when the Render URL is created after deploy.
+ */
+let API = ''
+
+async function resolveApi() {
+  const fromUrl = new URLSearchParams(location.search).get('api')
+  if (fromUrl) {
+    localStorage.setItem('darkeyes_api', fromUrl)
+    history.replaceState({}, '', location.pathname + location.hash)
+  }
+
+  const saved = localStorage.getItem('darkeyes_api')
+  if (saved) return saved.replace(/\/+$/, '')
+
+  try {
+    const res = await fetch('./config.json', { cache: 'no-store' })
+    const cfg = await res.json()
+    if (cfg?.apiBaseUrl) return String(cfg.apiBaseUrl).replace(/\/+$/, '')
+  } catch {
+    /* config.json is optional */
+  }
+
+  return (import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000').replace(/\/+$/, '')
+}
 
 const app = document.getElementById('app')
 
@@ -270,10 +299,30 @@ async function requestCode() {
   }
 }
 
-$('#go').addEventListener('click', requestCode)
-$('#phone').addEventListener('keydown', (event) => {
-  if (event.key === 'Enter') requestCode()
-})
+async function boot() {
+  API = await resolveApi()
 
-// Wake the backend early — free hosts cold-start slowly.
-fetch(`${API}/api/health`).catch(() => {})
+  // A localhost fallback on a deployed site means nobody configured the backend.
+  const looksLocal = API.includes('localhost') || API.includes('127.0.0.1')
+  if (looksLocal && !['localhost', '127.0.0.1'].includes(location.hostname)) {
+    out.innerHTML = ''
+    out.appendChild(
+      alertBox(
+        'warn',
+        `This site is not pointed at a bot yet. Open it once as
+         <code>/?api=https://YOUR-BOT.onrender.com</code> — or set
+         <code>apiBaseUrl</code> in <code>config.json</code> and redeploy.`
+      )
+    )
+  }
+
+  // Wake the backend early — free hosts cold-start slowly.
+  fetch(`${API}/api/health`).catch(() => {})
+
+  $('#go').addEventListener('click', requestCode)
+  $('#phone').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') requestCode()
+  })
+}
+
+boot()
