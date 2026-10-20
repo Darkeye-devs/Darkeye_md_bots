@@ -129,3 +129,43 @@ npm run dev                              # http://localhost:5173
 | `409 Another pairing is in progress` | someone else is mid-pairing | the message tells you how long to wait |
 | Session ID works locally but not on Render | the value was truncated on paste | re-copy with the **Copy** button |
 | Landing page shows old content | Vercel cached the build | redeploy with **Redeploy → Clear cache** |
+
+---
+
+## 6. This deployment, as it actually stands
+
+The site is already live on Vercel:
+
+| Thing | Value |
+| --- | --- |
+| Project | `dark-eyes` (`prj_4TBUNdusLxKNicSynSHtcrqHeOFC`) |
+| Production URL | https://dark-eyes-multiple08021016309-3260.vercel.app |
+| Source of the page | `landing/` (Vite, `dist` output) |
+
+### Pointing the site at your bot without a rebuild
+
+The page resolves the backend URL in this order, so deploy order never matters:
+
+1. `?api=https://your-bot.onrender.com` — one visit is enough, it is remembered in
+   `localStorage`. Use this the moment Render gives you a URL.
+2. `landing/public/config.json` → `{ "apiBaseUrl": "https://…" }` — edit and redeploy.
+3. `VITE_API_BASE_URL` — baked in at build time.
+4. `http://localhost:3000` — local development.
+
+If none of 1–3 is set the page says so instead of failing silently.
+
+### One setting to check on a fresh project
+
+New Vercel projects can come with **Deployment Protection → Vercel Authentication**
+switched on, which returns `302` to `vercel.com/sso-api` for everyone who is not
+logged into your Vercel account.
+
+Project → **Settings** → **Deployment Protection** → *Vercel Authentication* → **Disabled**.
+
+Verify from a terminal:
+
+```bash
+curl -sI https://<your-project>.vercel.app | head -1     # want: HTTP/2 200
+```
+
+`302` there means protection is still on, not that the build is broken.
