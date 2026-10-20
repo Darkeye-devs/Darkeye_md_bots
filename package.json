@@ -1,0 +1,39 @@
+{
+  "name": "dark-eyes-bot",
+  "version": "1.0.0",
+  "description": "Dark Eyes \u2014 a plugin-driven WhatsApp bot with a browser pairing panel",
+  "type": "module",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "node --test tests/",
+    "check": "node scripts/check-syntax.js",
+    "audit": "node scripts/audit.js",
+    "docs": "node scripts/gen-docs.js",
+    "verify": "node scripts/check-syntax.js && node --test tests/ && node scripts/audit.js"
+  },
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "baileys",
+    "dark-eyes"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@whiskeysockets/baileys": "6.7.24",
+    "better-sqlite3": "^11.7.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "node-cron": "^3.0.3",
+    "pino": "^9.6.0",
+    "qrcode": "^1.5.4",
+    "sharp": "^0.33.5"
+  },
+  "devDependencies": {
+    "pino-pretty": "^11.3.0"
+  }
+}

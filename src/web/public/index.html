@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dark Eyes — Pairing Panel</title>
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+<div class="glow"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <img src="assets/logo.svg" alt="Dark Eyes" />
+    <div>
+      <h1>DARK EYES</h1>
+      <p id="tagline">the eye that sees</p>
+    </div>
+  </div>
+  <span id="pill" class="pill pill--idle"><i></i><span id="pill-text">checking…</span></span>
+</header>
+
+<main>
+  <!-- ── PAIRING CARD ─────────────────────── -->
+  <section id="pair-card" class="card">
+    <div class="card-head">
+      <h2>Link a WhatsApp account</h2>
+      <p>Scan the QR with your phone, or type an 8-digit code into WhatsApp.</p>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab is-active" data-tab="code" role="tab">Pairing code</button>
+      <button class="tab" data-tab="qr" role="tab">QR code</button>
+    </div>
+
+    <div class="tab-panel is-active" data-panel="code">
+      <label for="phone">WhatsApp number</label>
+      <div class="field">
+        <input id="phone" type="tel" inputmode="numeric" placeholder="2348012345678" autocomplete="off" />
+        <button id="btn-pair" class="btn btn--primary">Get code</button>
+      </div>
+      <p class="hint">Country code first, digits only. No <code>+</code>, no spaces.</p>
+
+      <div id="code-box" class="code-box" hidden>
+        <span class="code-label">Enter this in WhatsApp → Linked devices → Link with phone number</span>
+        <div class="code" id="code">········</div>
+        <div class="code-meta">
+          <span id="code-countdown">expires in 60s</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-panel="qr">
+      <div class="qr-wrap" id="qr-wrap">
+        <img id="qr-img" alt="WhatsApp QR code" hidden />
+        <div id="qr-empty" class="qr-empty">
+          <p>No QR yet.</p>
+          <button id="btn-qr" class="btn btn--primary">Generate QR</button>
+        </div>
+      </div>
+      <p class="hint">WhatsApp → Settings → Linked devices → Link a device</p>
+    </div>
+
+    <div id="error" class="alert alert--error" hidden></div>
+  </section>
+
+  <!-- ── CONNECTED CARD ───────────────────── -->
+  <section id="live-card" class="card" hidden>
+    <div class="card-head">
+      <h2 id="live-title">Connected</h2>
+      <p id="live-sub">Dark Eyes is online.</p>
+    </div>
+    <div class="grid">
+      <div class="stat"><span class="stat-label">Number</span><strong id="s-number">—</strong></div>
+      <div class="stat"><span class="stat-label">Uptime</span><strong id="s-uptime">—</strong></div>
+      <div class="stat"><span class="stat-label">Messages</span><strong id="s-messages">0</strong></div>
+      <div class="stat"><span class="stat-label">Commands run</span><strong id="s-commands">0</strong></div>
+      <div class="stat"><span class="stat-label">Groups</span><strong id="s-groups">0</strong></div>
+      <div class="stat"><span class="stat-label">Users</span><strong id="s-users">0</strong></div>
+    </div>
+    <div class="foot-row">
+      <span id="s-registry" class="muted">—</span>
+      <button id="btn-logout" class="btn btn--ghost">Log out &amp; reset session</button>
+    </div>
+  </section>
+
+  <!-- ── CAPABILITIES ─────────────────────── -->
+  <section class="card card--tight">
+    <div class="card-head"><h2>Capabilities</h2></div>
+    <ul class="caps" id="caps">
+      <li><i class="dot"></i><span>loading…</span></li>
+    </ul>
+  </section>
+
+  <p class="footnote">Session is stored in <code>data/auth</code>. Logging out forces a fresh pairing.</p>
+</main>
+
+<script src="js/app.js" type="module"></script>
+</body>
+</html>
