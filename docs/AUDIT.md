@@ -1,6 +1,6 @@
 # Dark Eyes — command audit
 
-Generated 2026-10-20T18:13:09.973Z from `docs/command-target-list.md`
+Generated 2026-10-20T18:27:47.715Z from `docs/command-target-list.md`
 
 ## The headline
 

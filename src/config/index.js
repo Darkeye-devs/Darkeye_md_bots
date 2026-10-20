@@ -43,6 +43,8 @@ export const config = {
 
   port: int(process.env.PORT, 3000),
   panelToken: str(process.env.PANEL_TOKEN, ''),
+  // Which origins may call the API from a browser (the Vercel landing page).
+  corsOrigins: (process.env.CORS_ORIGINS ?? '*').split(',').map((o) => o.trim()).filter(Boolean),
 
   sessionDir: resolve(str(process.env.SESSION_DIR, 'data/auth')),
   dbPath: resolve(str(process.env.DB_PATH, 'data/darkeyes.db')),

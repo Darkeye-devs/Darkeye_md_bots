@@ -9,3 +9,9 @@ backups/
 npm-debug.log*
 coverage/
 dist/
+
+# landing build output / local env
+landing/dist/
+landing/.vercel/
+landing/.env
+.vercel/

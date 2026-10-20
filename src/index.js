@@ -10,6 +10,7 @@ import * as scheduler from './services/scheduler.js'
 import { startServer } from './web/server.js'
 import { sessionExists } from './core/auth.js'
 import { hydrateFromEnv, sessionFromEnv } from './core/session.js'
+import { cleanupPairings } from './core/pairing.js'
 
 const banner = `
   ██████╗  █████╗ ██████╗ ██╗  ██╗    ███████╗██╗   ██╗███████╗███████╗
@@ -86,6 +87,9 @@ async function main() {
   }
 
   scheduler.start(state.sock)
+
+  // drop abandoned public pairings every 10 minutes
+  setInterval(cleanupPairings, 10 * 60_000).unref()
 
   // ── graceful shutdown ──────────────────────
   const shutdown = async (signal) => {

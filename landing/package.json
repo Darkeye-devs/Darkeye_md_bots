@@ -1,0 +1,15 @@
+{
+  "name": "dark-eyes-landing",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Public landing + pairing site for Dark Eyes. Deploy on Vercel; talks to the Render backend.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^6.0.7"
+  }
+}

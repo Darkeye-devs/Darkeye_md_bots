@@ -1,125 +1,241 @@
-# 👁️ Dark Eyes
+<!-- DARK EYES — designed banner + badges. If you fork this, keep the credit line. -->
 
-**the eye that sees**
+<div align="center">
 
-A WhatsApp **MD bot** you can host in five minutes: 248 commands that actually run,
-a browser pairing panel (QR *or* 8-digit code), and a **Session ID** so your host
-never logs you out — even on free tiers that wipe the disk.
+<img src="https://raw.githubusercontent.com/Darkeye-devs/Darkeye_md_bots/main/docs/assets/banner.png" width="100%" alt="Dark Eyes — the eye that sees" />
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Darkeye-devs/Darkeye_md_bots)
+<br/>
+<br/>
 
-![Dark Eyes pairing panel](docs/screenshot.png)
+<a href="https://github.com/Darkeye-devs/Darkeye_md_bots/fork">
+  <img src="https://img.shields.io/badge/FORK%20THIS%20REPO-6D28D9?style=for-the-badge&logo=git&logoColor=white" alt="Fork" />
+</a>
+<a href="https://render.com/deploy?repo=https://github.com/Darkeye-devs/Darkeye_md_bots">
+  <img src="https://img.shields.io/badge/DEPLOY%20TO%20RENDER-0EA5E9?style=for-the-badge&logo=render&logoColor=white" alt="Deploy to Render" />
+</a>
+<a href="https://github.com/Darkeye-devs/Darkeye_md_bots/stargazers">
+  <img src="https://img.shields.io/badge/STAR%20THE%20REPO-F472B6?style=for-the-badge&logo=github&logoColor=white" alt="Star" />
+</a>
 
-### Host it in 3 steps
+<br/>
+<br/>
 
-| # | Do this | Where |
+<img src="https://readme-typing-svg.demolab.com?font=Orbitron&weight=800&size=20&duration=2600&pause=900&color=22D3EE&center=true&vCenter=true&width=620&lines=249+commands.+Zero+fake+features.;Paste+2+values.+Bot+is+alive.;60+tests.+Every+command+really+runs.;THE+EYE+THAT+SEES" alt="typing" />
+
+<br/>
+
+<img src="https://img.shields.io/badge/COMMANDS-249-22D3EE?style=flat-square&labelColor=0b0f16" />
+<img src="https://img.shields.io/badge/ALIASES-211-8B5CF6?style=flat-square&labelColor=0b0f16" />
+<img src="https://img.shields.io/badge/TESTS-60%20passing-34D399?style=flat-square&labelColor=0b0f16" />
+<img src="https://img.shields.io/badge/LOAD%20FAILURES-0-F472B6?style=flat-square&labelColor=0b0f16" />
+<img src="https://img.shields.io/badge/NODE-20%2B-339933?style=flat-square&logo=node.js&logoColor=white&labelColor=0b0f16" />
+<img src="https://img.shields.io/badge/LICENSE-MIT-22D3EE?style=flat-square&labelColor=0b0f16" />
+
+</div>
+
+<br/>
+
+<img src="https://raw.githubusercontent.com/Darkeye-devs/Darkeye_md_bots/main/docs/assets/rule.png" width="100%" />
+
+## 👁️ What is Dark Eyes?
+
+A **WhatsApp MD bot** you can actually finish setting up. Fork it, paste a **Session ID** and your **owner number**, deploy — and it is online.
+
+Most bot repos advertise *"1000+ commands"* and quietly ship a few hundred aliases and a pile of buttons that answer *"coming soon"*. Dark Eyes is built around the opposite rule:
+
+> **A command only exists if it has working code behind it.**
+
+That rule is not a slogan — it is enforced by the loader, measured by an audit script, and proven by 60 tests that execute the real command functions.
+
+<br/>
+
+## ⚡ Deploy in 2 minutes
+
+| Step | What you do | Where |
+| :--: | --- | --- |
+| **1** | Pair your number, then hit **Copy Session ID** | your panel (`/`) |
+| **2** | Paste `SESSION_ID` + `OWNER_NUMBER` | Render |
+| **3** | Send `.menu` from your own WhatsApp | anywhere |
+
+No terminal. No permanent disk. No QR stuck on a server log.
+
+<details>
+<summary><b>Where do I get a Session ID?</b></summary>
+
+<br/>
+
+**If you deployed with the UI:** open your app URL → pair with the QR or the 8-digit pairing code → scroll to **Session ID for hosting** → copy it. Paste it into `SESSION_ID` and redeploy.
+
+**If you are running locally:** `npm install && npm start` → open `http://localhost:3000` → pair → copy the Session ID. You can delete the local copy afterwards.
+
+> The Session ID packs your whole Baileys auth folder into one base64 string. It rebuilds the login on every boot, which is exactly why free hosts that wipe the disk still work.
+
+</details>
+
+<br/>
+
+## 🚀 One-click deploys
+
+<div align="center">
+
+| Host | Button | Notes |
 | --- | --- | --- |
-| 1 | Pair your number once and **copy the Session ID** | the panel (`/`) |
-| 2 | Click **Deploy to Render** and paste `SESSION_ID` + `OWNER_NUMBER` | Render |
-| 3 | Send `.menu` from your number | WhatsApp |
+| **Render** | [![Render](https://img.shields.io/badge/Render-0EA5E9?style=for-the-badge&logo=render&logoColor=white)](https://render.com/deploy?repo=https://github.com/Darkeye-devs/Darkeye_md_bots) | runs the bot (`render.yaml` asks for the 2 secrets) |
+| **Vercel** | [![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/new/clone?repository-url=https://github.com/Darkeye-devs/Darkeye_md_bots&root-directory=landing&env=VITE_API_BASE_URL) | runs the public landing page in `landing/` |
+| **Koyeb** | [![Koyeb](https://img.shields.io/badge/Koyeb-FF009D?style=for-the-badge&logo=koyeb&logoColor=white)](https://app.koyeb.com/services/deploy?type=git&repository=github.com/Darkeye-devs/Darkeye_md_bots&branch=main) | set `PORT=8000` |
+| **Railway** | [![Railway](https://img.shields.io/badge/Railway-FF8700?style=for-the-badge&logo=railway&logoColor=white)](https://railway.app/new/template?template=https://github.com/Darkeye-devs/Darkeye_md_bots) | variables tab |
+| **Heroku** | [![Heroku](https://img.shields.io/badge/Heroku-430098?style=for-the-badge&logo=heroku&logoColor=white)](https://dashboard.heroku.com/new?template=https://github.com/Darkeye-devs/Darkeye_md_bots) | `app.json` + `Procfile` |
+| **Docker** | [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://github.com/Darkeye-devs/Darkeye_md_bots/blob/main/Dockerfile) | ffmpeg included |
+| **ZIP** | [![Download](https://img.shields.io/badge/DOWNLOAD%20.ZIP-8B5CF6?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Darkeye-devs/Darkeye_md_bots/archive/refs/heads/main.zip) | for panels |
 
-No terminal. No QR on a server. No persistent disk needed — the Session ID rebuilds
-the login on every boot. Full walkthrough: **[docs/HOSTING.md](docs/HOSTING.md)**.
+</div>
 
-> ⚠️ A Session ID is your WhatsApp account. Never post it, never commit it, never
-> show it in a tutorial screenshot.
+### 🌐 Want a public site? Split it: frontend on Vercel, bot on Render
 
----
+The repo is built for it. `landing/` is a standalone Vite site that talks to the
+bot's API over HTTPS, so you can give users a page instead of a raw panel.
 
-## For developers
-
-```
-╭──────────────────────────────╮
-│  👁️  DARK EYES               │
-│  248 commands · 209 aliases  │
-╰──────────────────────────────╯
-```
-
----
-
-## What makes this different
-
-| Claim | How it is enforced |
-| --- | --- |
-| Every command works | Each plugin has a real `execute()`. `npm test` runs 51 behavioural tests against those functions. |
-| No duplicate "features" | The registry refuses duplicate names **and** aliases that shadow commands. It caught 5 real collisions during development. |
-| Honest counts | `.menu` renders from the live registry. Aliases are listed beside their command, never as separate features. |
-| No fake "coming soon" | A command needing a key (`AI_API_KEY`, `DOWNLOAD_API_URL`) or a binary (`ffmpeg`) says **exactly** what is missing instead of failing silently. |
-| Numbers you can verify | `npm run audit` compares any target list against the registry and writes `docs/AUDIT.md`. |
-
-Current audit against the 1,000-command target list: **213 implemented · 116 alias-covered · 73 equivalent · 598 not built (each with a reason)**. See [`docs/AUDIT.md`](docs/AUDIT.md).
-
----
-
-## Quick start
-
-```bash
-git clone <your-repo> dark-eyes-bot
-cd dark-eyes-bot
-npm install
-cp .env.example .env      # then edit OWNER_NUMBER at minimum
-npm start
-```
-
-Open **http://localhost:3000** and pair:
-
-- **Pairing code** — type your number (country code first, digits only), copy the 8-digit code, then in WhatsApp go to **Linked devices → Link with phone number**.
-- **QR code** — click *Generate QR*, then **Linked devices → Link a device**.
-
-The session is saved in `data/auth/`, so restarts do not require re-pairing.
-
-### Requirements
-
-- Node.js **20+**
-- `ffmpeg` *(optional)* — video → sticker, audio effects, sticker → video
-- No API keys needed for the core 248 commands. AI and downloaders activate when you add keys.
-
----
-
-## Getting your API keys
-
-Several things work with **no key at all** — currency, crypto, weather, dictionary, DNS, IP lookup, QR codes, text-maker images, images/stickers (via `sharp`), games, economy, reminders, moderation.
-
-These need a key or a binary. Set the variables in `.env`:
-
-| Feature | Variable | Free option? |
+| Half | Host | Why |
 | --- | --- | --- |
-| AI chat / vision / images | `AI_API_KEY`, `AI_BASE_URL`, `AI_MODEL` | ✅ **Groq** and **OpenRouter** both have free tiers and are OpenAI-compatible — set `AI_BASE_URL=https://api.groq.com/openai/v1` or `https://openrouter.ai/api/v1` |
-| Media downloads (YT, TikTok, IG…) | `DOWNLOAD_API_URL` | ✅ Self-host [`yt-dlp`](https://github.com/yt-dlp/yt-dlp) behind a tiny HTTP wrapper (see `docs/DEPLOY.md`). Paid APIs also exist if you prefer. |
-| Video stickers, audio effects | *(none — install `ffmpeg`)* | ✅ `apt install ffmpeg` |
+| `landing/` (static) | **Vercel** | free CDN, instant deploys, custom domain |
+| `src/` (Baileys socket + SQLite) | **Render / Koyeb / Railway** | needs a long-lived process, which serverless cannot provide |
 
-> **Heads up on "premium" APIs:** remove.bg (background removal), Spotify/Apple Music/Tidal downloads (DRM), and serious OCR/voice cloning have **no free tier**. I have not registered those commands — the audit lists them as not built with that exact reason, rather than shipping a button that fails.
+```
+user → dark-eyes.vercel.app → (CORS) → dark-eyes-bot.onrender.com → WhatsApp
+```
 
----
+Pairing on the public site is guarded: **6 requests per IP per hour**, one pairing
+at a time, a single-use `pairToken` before the Session ID is handed over, and
+abandoned pairings expire in 15 minutes.
 
-## Architecture
+Full walkthrough — env vars, CLI commands, CORS gotchas, troubleshooting:
+**[docs/VERCEL-SPLIT.md](docs/VERCEL-SPLIT.md)**
+
+> [!WARNING]
+> **Free tiers sleep.** Render's free web service idles out after ~15 minutes, and a sleeping bot cannot answer WhatsApp messages. Ping `/api/health` every 5 minutes with a free uptime monitor, or take the Starter plan for 24/7.
+
+<br/>
+
+## 🧠 Why this one is different
+
+<table>
+<tr><th align="left">Claim</th><th align="left">How it is enforced</th></tr>
+<tr>
+<td><b>Every command works</b></td>
+<td>Each plugin has a real <code>execute()</code>. <code>npm test</code> runs 60 behavioural tests against those functions with a fake socket and a real database.</td>
+</tr>
+<tr>
+<td><b>No padded counts</b></td>
+<td>The registry refuses duplicate names <i>and</i> aliases that shadow commands. It caught <b>5 real collisions</b> while this repo was being built.</td>
+</tr>
+<tr>
+<td><b>Honest numbers</b></td>
+<td><code>npm run audit</code> grades any target list against the live registry and writes <code>docs/AUDIT.md</code>.</td>
+</tr>
+<tr>
+<td><b>No dead buttons</b></td>
+<td>A command needing a key or a binary says exactly what is missing instead of silently failing.</td>
+</tr>
+<tr>
+<td><b>No reconnect storms</b></td>
+<td>Reconnects are single-flight with 2s → 4s → 8s → 16s → 30s backoff, capped at 12 attempts. (An earlier build opened 58 sockets in 13s — that bug is now a regression test.)</td>
+</tr>
+</table>
+
+<br/>
+
+## 📊 The honest scoreboard
+
+Audited against the popular 1,000-command list:
+
+| Measure | Count |
+| --- | ---: |
+| Names on that list | 1000 |
+| **Implemented with real code** | **213** |
+| Reachable through an alias | 116 |
+| Covered by an equivalent command | 73 |
+| Not built — each with a written reason | 598 |
+| **Live commands we ship** | **249** (+211 aliases) |
+| **Commands we built that are not on that list** | **36** |
+
+The 598 gaps are documented, not hidden: DRM-protected music downloads, paid image APIs, social "stalk" endpoints, and game engines that were not built yet. → [`docs/AUDIT.md`](docs/AUDIT.md)
+
+<br/>
+
+## 🧩 Command categories
+
+<div align="center">
+
+| Category | Count | Highlights |
+| :--- | ---: | :--- |
+| 🎲 **Fun** | 54 | 8ball · dice · rps · trivia · guess-the-number · unbeatable tic-tac-toe · slots · ship · 38 roleplay reactions |
+| 🎬 **Media** | 50 | sticker · toimg · tovideo · take · view-once reveal · getpp · 13 image effects · 11 download sites |
+| 🧰 **Tools** | 38 | units · currency · crypto · calc · roman · base64/binary/hex · password · QR · weather · DNS · whois · translate · define |
+| 🛡️ **Moderation** | 35 | kick · add · promote · mute · tagall · hidetag · warns · antilink · antispam · antibadword · welcome/goodbye |
+| 👑 **Owner** | 16 | mode · broadcast · backup · reload · restart · block · join · session · shell · eval |
+| 📌 **Misc** | 15 | reminders · notes · to-do · AFK · timer |
+| 💰 **Economy** | 13 | daily · work · fish · mine · bank · pay · rob · gamble · shop · inventory · richlist |
+| 🌐 **General** | 11 | menu · ping · stats · info · me · rules |
+| 🧠 **AI** | 10 | chat with memory · summarize · rewrite · grammar · imagine · describe · forget |
+
+</div>
+
+Full list: [`docs/COMMANDS.md`](docs/COMMANDS.md) — generated from the live registry, never hand-written.
+
+<br/>
+
+## 🔑 Keys & capabilities
+
+The core is **key-free**. This table is the only place anything optional appears:
+
+| Feature | Needs | Free option |
+| --- | --- | --- |
+| AI chat, vision, image generation | `AI_API_KEY` | ✅ Groq or OpenRouter free tiers |
+| Downloads (YouTube, TikTok, IG, X…) | `DOWNLOAD_API_URL` | ✅ self-host `yt-dlp` behind a 20-line resolver |
+| Video stickers, audio effects | `ffmpeg` | ✅ preinstalled in the Docker image |
+
+Commands without their key stay **dormant** and tell the user exactly what to add. Nothing pretends.
+
+<br/>
+
+## 📁 Project layout
 
 ```
 src/
-├── index.js              boot: config → db → plugins → web panel → socket
-├── config/               env parsing + validation (fails fast on bad config)
-├── core/                 the engine — no bot features live here
-│   ├── client.js         Baileys socket factory, reconnect with backoff
-│   ├── connection.js     QR / pairing code / disconnect handling
-│   ├── auth.js           session persistence + reset
-│   ├── registry.js       loads & validates plugins, resolves aliases
-│   ├── router.js         text → command → context → plugin
-│   ├── middleware.js     mode → permissions → capabilities → cooldown
-│   ├── context.js        the ctx object every plugin receives
-│   └── state.js          live runtime state (read by the panel)
-├── handlers/             message, group, call, reaction, automod, autoai
-├── plugins/              ← all features live here (9 categories)
-├── services/             database, ai, sticker, textmaker, downloader, economy, scheduler
-├── lib/                  pure helpers: jid, text, time, parse, target, errors
-├── db/                   schema.sql + migrations
-└── web/                  express panel: SSE status, pairing routes, dark UI
+├── core/       engine — client, session, registry, router, middleware, context
+├── handlers/   message, group, call, reaction, automod, autoai
+├── plugins/    every feature (9 categories)
+├── services/   database, ai, sticker, textmaker, downloader, economy, scheduler
+├── lib/        pure helpers (jid, text, time, parse, target, errors)
+├── db/         schema.sql + migrations
+└── web/        pairing panel (express + SSE, dark UI)
 ```
 
-Full details: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+**[Architecture →](docs/ARCHITECTURE.md)** · **[Plugin guide →](docs/PLUGINS.md)** · **[Hosting →](docs/HOSTING.md)** · **[Deploying →](docs/DEPLOY.md)**
 
-### The plugin contract
+<br/>
 
-Drop a file in `src/plugins/<category>/`:
+## 🛠️ For developers
+
+```bash
+git clone https://github.com/Darkeye-devs/Darkeye_md_bots
+cd Darkeye_md_bots
+npm install
+cp .env.example .env      # set OWNER_NUMBER
+npm start                 # → http://localhost:3000
+```
+
+| Script | What it does |
+| --- | --- |
+| `npm start` | bot + panel |
+| `npm test` | 60 behavioural tests |
+| `npm run audit` | grade a command list → `docs/AUDIT.md` |
+| `npm run docs` | regenerate `docs/COMMANDS.md` |
+| `npm run check` | parse every source file |
+| `npm run verify` | all of the above in one go |
+| `npm run assets` | rebuild the banner, logo and social image |
+
+Adding a command is one file drop:
 
 ```js
 export default {
@@ -127,7 +243,6 @@ export default {
   aliases: ['s'],
   category: 'media',
   description: 'Turn an image or video into a WhatsApp sticker',
-  usage: '.sticker (reply to media)',
   cooldown: 4,
   requires: { ffmpeg: true },
   async execute(ctx) {
@@ -137,87 +252,31 @@ export default {
 }
 ```
 
-Shipped plugins get: automatic permission checks, cooldowns, capability gating, error handling, menu registration, help text, and a place in the audit report.
+Permissions, cooldowns, capability gating, error handling, menu registration and the help card all come free from the pipeline.
 
----
+<br/>
 
-## Commands
+## ⚖️ Notice
 
-Run `.menu` in WhatsApp, or read the generated reference: [`docs/COMMANDS.md`](docs/COMMANDS.md).
+> Built for **educational use**. This is an **unofficial** WhatsApp client (Baileys) — technically against WhatsApp's Terms of Service, as with every MD bot. Use a number you can afford to lose. No spam tooling is included, on purpose.
 
-| Category | Count | Highlights |
-| --- | ---: | --- |
-| Fun | 54 | 8ball, dice, rps, trivia, guess-the-number, unbeatable tic-tac-toe, slots, ship, 38 roleplay reactions |
-| Media | 50 | sticker, toimg, tovideo, take, vv, getpp, 13 image effects, 11 download sites |
-| Tools | 38 | units, currency, crypto, calc, roman, base64/binary/hex, password, QR, weather, DNS, whois, translate, define |
-| Moderation | 35 | kick/add/promote/demote, mute, tagall, hidetag, warns, antilink, antispam, antibadword, welcome/goodbye |
-| Owner | 16 | mode, broadcast, backup, reload, restart, block, join, shell, eval |
-| Misc | 15 | reminders, notes, to-do, AFK, timer |
-| Economy | 13 | daily, work, fish, mine, bank, pay, rob, gamble, shop, inventory, richlist |
-| General | 11 | menu, ping, stats, info, me, rules, **session** (owner: get your Session ID) |
-| AI | 10 | ai chat (per-chat memory), summarize, translate, imagine, describe, forget |
+## 📜 Credits
 
----
-
-## Scripts
-
-| Command | What it does |
+| Role | Credit |
 | --- | --- |
-| `npm start` | Run the bot + panel |
-| `npm run dev` | Same, with watch mode |
-| `npm test` | 51 behavioural tests (real plugin execution) |
-| `npm run check` | Parse every source file |
-| `npm run audit` | Compare a target command list with the live registry → `docs/AUDIT.md` |
-| `npm run docs` | Regenerate `docs/COMMANDS.md` from the registry |
-| `npm run verify` | Syntax + tests + audit in one go |
-| `node src/index.js` with `SESSION_ID` set | Boot already paired (what hosts do) |
+| 👨‍💻 Developer | **Darkeye Devs** |
+| 📦 Core library | [WhiskeySockets / Baileys](https://github.com/WhiskeySockets/Baileys) |
+| 🖼️ Engine of images | [sharp](https://sharp.pixelplumbing.com/) + `ffmpeg` |
+| 🗄️ Storage | [better-sqlite3](https://github.com/WiseLibs/better-sqlite3) |
 
----
+<br/>
 
-## Deploying 24/7
+<div align="center">
 
-One-click config is in the repo for every major host:
+<img src="https://raw.githubusercontent.com/Darkeye-devs/Darkeye_md_bots/main/docs/assets/logo.png" width="96" alt="Dark Eyes" />
 
-| Host | File | Notes |
-| --- | --- | --- |
-| **Render** | `render.yaml` | blueprint prompts for `SESSION_ID` + `OWNER_NUMBER` only |
-| **Koyeb** | `koyeb.yaml` | free instance, set `PORT=8000` |
-| **Railway** | `railway.json` | variables tab for the two secrets |
-| **Heroku-style** | `app.json` + `Procfile` | `heroku config:set …` |
-| **Docker/VPS** | `Dockerfile` | includes ffmpeg, volume `/app/data` |
-| **pm2** | `ecosystem.config.cjs` | `pm2 start ecosystem.config.cjs` |
+**《 DARK EYES — THE EYE THAT SEES 》**
 
-### How SESSION_ID works
+<sub>If this repo helped you, a ⭐ costs nothing and helps a lot.</sub>
 
-```
-panel pairs once ──► auth folder ──► bundled to base64 ──► SESSION_ID
-                                                              │
-host boots ──► hydrateFromEnv() ──► writes data/auth ──► Baileys connects
-```
-
-- `src/core/session.js` exports/imports the whole auth folder.
-- On boot, `loadAuthState()` rebuilds the folder **before** Baileys reads it.
-- Pasted strings are cleaned automatically (quotes, newlines, stray prefixes).
-- A local `data/auth` folder still wins if one exists, so nothing breaks when
-  you run it on a laptop with a disk.
-
-> ⚠️ **Security:** if the panel is reachable from the internet, set `PANEL_TOKEN`.
-> Open the panel once as `/?token=YOUR_TOKEN` — it is stored and stripped from the
-> address bar. Without it, anyone with the URL can pair a number or wipe your session.
-
-## What this bot deliberately does NOT do
-
-Being honest about gaps is part of the design:
-
-- **No DRM circumvention** — Spotify, Apple Music and Tidal downloads are not implemented. Anyone claiming otherwise is usually faking it.
-- **No social-media "stalking" commands** — those APIs break constantly and charge money.
-- **No fake anti-* guards** — `antilink`, `antispam`, `antimedia`, `antisticker`, `antiforward`, `anticall` are real and can be enforced through Baileys. Guards that cannot be enforced reliably were left out rather than shipped as decoration.
-- **No owner hierarchy theatre** — one owner list in `.env`, checked properly, instead of five overlapping ranks.
-
----
-
-## License
-
-MIT — see [`LICENSE`](LICENSE).
-
-Built with [Baileys](https://github.com/WhiskeySockets/Baileys). Using an unofficial WhatsApp client against WhatsApp's Terms of Service carries a risk of your number being limited or banned. Use a number you can afford to lose.
+</div>

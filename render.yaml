@@ -42,3 +42,6 @@ services:
       # ── panel lock (auto-generated secret) ──
       - key: PANEL_TOKEN
         generateValue: true
+      # ── set this to your Vercel URL when you host the landing page ──
+      - key: CORS_ORIGINS
+        value: "*"

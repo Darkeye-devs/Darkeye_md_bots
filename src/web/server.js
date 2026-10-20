@@ -8,6 +8,7 @@ import { registryStats, capabilities } from '../core/registry.js'
 import { summary } from '../services/database.js'
 import { sessionExists, pairedNumber } from '../core/auth.js'
 import { exportSession, importSession, sessionSummary } from '../core/session.js'
+import { startPublicPairing, getPublicPairing, claimSession, rateLimited, cleanupPairings } from '../core/pairing.js'
 import { connect, disconnect } from '../core/client.js'
 import { resetSession } from '../core/auth.js'
 import { isValidPhone, sanitizePhone } from '../lib/jid.js'
@@ -19,6 +20,23 @@ export function createServer() {
   const app = express()
   app.disable('x-powered-by')
   app.use(express.json({ limit: '256kb' }))
+
+  // ── CORS: the hosted landing page (Vercel) calls this API (Render) ──
+  app.use((req, res, next) => {
+    const origin = req.get('origin') ?? ''
+    const allowed = config.corsOrigins
+    const permit = allowed.includes('*') || allowed.some((o) => o && origin.startsWith(o))
+
+    if (permit && origin) {
+      res.set('access-control-allow-origin', allowed.includes('*') ? '*' : origin)
+      res.set('vary', 'origin')
+      res.set('access-control-allow-methods', 'GET,POST,OPTIONS')
+      res.set('access-control-allow-headers', 'content-type,x-panel-token')
+      res.set('access-control-max-age', '86400')
+    }
+    if (req.method === 'OPTIONS') return res.sendStatus(204)
+    next()
+  })
 
   // The panel is a single page; all API routes are small and JSON-only.
   app.use('/api', panelAuth)
@@ -80,6 +98,51 @@ export function createServer() {
       res.json({ ok: true, message: 'Socket opened — the QR will appear here shortly.' })
     } catch (error) {
       res.status(500).json({ ok: false, error: 'Could not open a socket.' })
+    }
+  })
+
+  // ── PUBLIC pairing API (used by the Vercel landing page) ──
+  // Only issues a pairing code + a Session ID to the caller who started it.
+  app.post('/api/public/pair', async (req, res) => {
+    if (rateLimited(req.ip ?? 'unknown')) {
+      return res.status(429).json({ ok: false, error: 'Too many pairing attempts from this address. Try again later.' })
+    }
+
+    const phone = sanitizePhone(req.body?.phone ?? '')
+    if (!isValidPhone(phone)) {
+      return res.status(400).json({ ok: false, error: 'Enter your number with the country code, digits only (e.g. 2348012345678).' })
+    }
+
+    try {
+      const record = await startPublicPairing(phone)
+      res.json({
+        ok: true,
+        phone,
+        code: record.code,
+        pairToken: record.pairToken,
+        expiresAt: record.expiresAt,
+        secondsLeft: Math.max(0, Math.ceil((record.expiresAt - Date.now()) / 1000)),
+        instructions: 'WhatsApp → Linked devices → Link with phone number → enter the code.'
+      })
+    } catch (error) {
+      res.status(error.status ?? 500).json({ ok: false, error: error.message })
+    }
+  })
+
+  app.get('/api/public/pair/:phone', (req, res) => {
+    const record = getPublicPairing(sanitizePhone(req.params.phone))
+    if (!record) return res.status(404).json({ ok: false, error: 'No active pairing for that number.' })
+    res.json({ ok: true, ...record })
+  })
+
+  app.post('/api/public/session', async (req, res) => {
+    const phone = sanitizePhone(req.body?.phone ?? '')
+    const pairToken = String(req.body?.pairToken ?? '')
+    try {
+      const sessionId = await claimSession(phone, pairToken)
+      res.json({ ok: true, sessionId })
+    } catch (error) {
+      res.status(error.status ?? 500).json({ ok: false, error: error.message })
     }
   })
 

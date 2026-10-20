@@ -15,7 +15,8 @@
     "audit": "node scripts/audit.js",
     "docs": "node scripts/gen-docs.js",
     "verify": "node scripts/check-syntax.js && node --test tests/ && node scripts/audit.js",
-    "session": "node -e \"import('./src/core/session.js').then(async m=>{const s=await m.sessionSummary();console.log(s);process.exit(0)})\""
+    "session": "node -e \"import('./src/core/session.js').then(async m=>{const s=await m.sessionSummary();console.log(s);process.exit(0)})\"",
+    "assets": "node scripts/make-assets.js"
   },
   "keywords": [
     "whatsapp",
