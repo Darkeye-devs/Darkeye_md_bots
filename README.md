@@ -112,8 +112,9 @@ Pairing on the public site is guarded: **6 requests per IP per hour**, one pairi
 at a time, a single-use `pairToken` before the Session ID is handed over, and
 abandoned pairings expire in 15 minutes.
 
-No card available? Railway takes 30 seconds and needs no payment method —
-see **[docs/PAIRING-WITHOUT-CARD.md](docs/PAIRING-WITHOUT-CARD.md)**.
+No card available? Use **Zeabur** — free plan, no card, deploys this repo's
+Dockerfile as-is. Railway, Back4App and a zero-signup Cloudflare tunnel are also
+covered in **[docs/PAIRING-WITHOUT-CARD.md](docs/PAIRING-WITHOUT-CARD.md)**.
 
 Connect the site to a pairing backend in one command:
 
