@@ -10,7 +10,8 @@ services:
   - type: web
     name: dark-eyes-bot
     runtime: node
-    plan: starter          # free instances sleep after 15 min of inactivity
+    plan: free             # $0. Sleeps after 15 min idle — see the note below.
+    #                        Change to "starter" (~$7/mo) only if you need 24/7.
     region: frankfurt
     buildCommand: npm install
     startCommand: node src/index.js

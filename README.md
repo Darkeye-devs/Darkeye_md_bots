@@ -137,7 +137,9 @@ Every data command calls a real API — the full list, with which ones need a
 key and which are free: **[docs/APIS.md](docs/APIS.md)**
 
 > [!WARNING]
-> **Free tiers sleep.** Render's free web service idles out after ~15 minutes, and a sleeping bot cannot answer WhatsApp messages. Ping `/api/health` every 5 minutes with a free uptime monitor, or take the Starter plan for 24/7.
+> **Free tiers sleep.** Render's free web service idles out after ~15 minutes, and a sleeping bot cannot answer WhatsApp messages. Ping `/api/health` every 5 minutes with a free uptime monitor, or take the Starter plan (~$7/month) for 24/7.
+>
+> **Service type vs instance type.** You always create a *Web Service* — "instance" is just the size/plan you pick inside it. The blueprint ships with `plan: free`; choose **Free** in the dashboard if it asks. Render may also ask new accounts to verify a card with a **$1 authorisation that is reversed** — that is fraud prevention, not a subscription, and free services stay free.
 
 <br/>
 
