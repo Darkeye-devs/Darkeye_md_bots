@@ -95,6 +95,8 @@ No terminal. No permanent disk. No QR stuck on a server log.
 The repo is built for it. `landing/` is a standalone Vite site that talks to the
 bot's API over HTTPS, so you can give users a page instead of a raw panel.
 
+A live instance of exactly this setup: **https://dark-eyes-multiple08021016309-3260.vercel.app**
+
 | Half | Host | Why |
 | --- | --- | --- |
 | `landing/` (static) | **Vercel** | free CDN, instant deploys, custom domain |
@@ -107,6 +109,15 @@ user → dark-eyes.vercel.app → (CORS) → dark-eyes-bot.onrender.com → What
 Pairing on the public site is guarded: **6 requests per IP per hour**, one pairing
 at a time, a single-use `pairToken` before the Session ID is handed over, and
 abandoned pairings expire in 15 minutes.
+
+Point the page at your own bot with one visit — no rebuild:
+
+```
+https://your-site.vercel.app/?api=https://your-bot.onrender.com
+```
+
+Or set `apiBaseUrl` in `landing/public/config.json`. Redeploy the static site
+from the command line with `npm run deploy:vercel` (needs `VERCEL_TOKEN`).
 
 Full walkthrough — env vars, CLI commands, CORS gotchas, troubleshooting:
 **[docs/VERCEL-SPLIT.md](docs/VERCEL-SPLIT.md)**

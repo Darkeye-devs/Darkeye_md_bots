@@ -309,9 +309,10 @@ async function boot() {
     out.appendChild(
       alertBox(
         'warn',
-        `This site is not pointed at a bot yet. Open it once as
-         <code>/?api=https://YOUR-BOT.onrender.com</code> — or set
-         <code>apiBaseUrl</code> in <code>config.json</code> and redeploy.`
+        `Pairing is not switched on yet — no bot backend is linked to this site.
+         If you are the operator, open this page once as
+         <code>/?api=https://YOUR-BOT.onrender.com</code> or set
+         <code>apiBaseUrl</code> in <code>config.json</code>.`
       )
     )
   }

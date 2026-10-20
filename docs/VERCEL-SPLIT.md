@@ -162,6 +162,14 @@ logged into your Vercel account.
 
 Project → **Settings** → **Deployment Protection** → *Vercel Authentication* → **Disabled**.
 
+Or do it from the API, which is what this project had done:
+
+```bash
+curl -X PATCH -H "Authorization: Bearer $VERCEL_TOKEN" -H "content-type: application/json" \
+  -d '{"ssoProtection":null}' \
+  "https://api.vercel.com/v9/projects/dark-eyes?teamId=$VERCEL_TEAM_ID"
+```
+
 Verify from a terminal:
 
 ```bash
@@ -169,3 +177,21 @@ curl -sI https://<your-project>.vercel.app | head -1     # want: HTTP/2 200
 ```
 
 `302` there means protection is still on, not that the build is broken.
+
+### Redeploying the static site without the dashboard
+
+`npm run deploy:vercel` builds nothing — it uploads `landing/dist` as-is, so run
+the Vite build first when the source changed:
+
+```bash
+cd landing && npm run build && cd ..
+VERCEL_TOKEN=xxx VERCEL_TEAM_ID=team_xxx npm run deploy:vercel
+```
+
+It uploads each file to `/v2/files` (content-addressed, so PNGs stay binary-safe)
+and then creates the deployment, printing the URL when the state reaches `READY`.
+Flags: `--dir`, `--root`, `--project`, `--target`, `--dry-run`.
+
+> The current production alias is the prebuilt upload, not a git build. The
+> project settings still say root `landing`, build `npm run build`, output
+> `dist`, so connecting the repo in the dashboard later works unchanged.
