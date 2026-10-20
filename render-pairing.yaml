@@ -1,0 +1,40 @@
+# ───────────────────────────────────────────────
+#  Dark Eyes — PAIRING SERVER blueprint
+#  Deploy → https://render.com/deploy?repo=https://github.com/Darkeye-devs/Darkeye_md_bots&blueprint=render-pairing.yaml
+#
+#  This is NOT the bot. It is the public backend the Vercel page talks to.
+#  Its only job: hand out pairing codes / QR codes, and return the Session ID
+#  to the browser that asked for it. It deliberately has no SESSION_ID of its
+#  own — an instance that is already linked refuses to pair anyone else.
+#
+#  The bot each user actually runs is a separate deploy (see render.yaml).
+# ───────────────────────────────────────────────
+services:
+  - type: web
+    name: dark-eyes-pairing
+    runtime: node
+    plan: free # sleeps after ~15 min idle; the site pings /api/health to wake it
+    region: frankfurt
+    buildCommand: npm install
+    startCommand: node src/index.js
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 20.20.2
+      - key: NODE_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: info
+      - key: TZ
+        value: Africa/Lagos
+      # Lock the owner panel — this instance should only be used through the
+      # public pairing routes.
+      - key: PANEL_TOKEN
+        generateValue: true
+      # Set this to the exact Vercel origin (scheme + host, no trailing slash).
+      # Anything else gets a CORS block, which looks like "the site is broken".
+      - key: CORS_ORIGINS
+        sync: false
+      # No SESSION_ID, no OWNER_NUMBER: this service never connects to WhatsApp
+      # as a bot, it only opens short-lived pairing sockets.

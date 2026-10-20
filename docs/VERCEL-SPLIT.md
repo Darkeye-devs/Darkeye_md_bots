@@ -239,3 +239,53 @@ deliberate:
 
 Split it only if the site grows its own backend, its own contributors, or its
 own release cadence — at that point the two halves stop being one product.
+
+---
+
+## 9. Wiring the two together (the only four steps)
+
+You need **two Render services**, and they are not the same thing:
+
+| Service | Blueprint | Purpose | Env it needs |
+| --- | --- | --- | --- |
+| **dark-eyes-pairing** | `render-pairing.yaml` | the public backend the Vercel page calls. Issues codes/QRs, returns Session IDs. Never links to WhatsApp itself. | `CORS_ORIGINS` |
+| **dark-eyes-bot** | `render.yaml` | the actual bot a user runs, one per WhatsApp number | `SESSION_ID`, `OWNER_NUMBER` |
+
+A pairing server with a `SESSION_ID` is useless: an instance that is already
+linked refuses to pair anyone else (`409 This bot is already linked…`). That is
+why the pairing blueprint has no session variables at all.
+
+### The four steps
+
+1. **Deploy the pairing server**
+   <https://render.com/deploy?repo=https://github.com/Darkeye-devs/Darkeye_md_bots&blueprint=render-pairing.yaml>
+   → free plan, no secrets to fill in. Wait for `Live`.
+2. **Copy its URL** — looks like `https://dark-eyes-pairing-xxxx.onrender.com`.
+3. **Point the site at it** from the repo root:
+
+   ```bash
+   VERCEL_TOKEN=… VERCEL_TEAM_ID=… npm run point:site https://dark-eyes-pairing-xxxx.onrender.com
+   ```
+
+   That script health-checks the backend (retrying while a free instance cold-starts),
+   writes `landing/public/config.json`, rebuilds and redeploys Vercel. It refuses
+   to run if you paste the site's own URL, or a URL that does not answer.
+4. **Allow the site in CORS** — Render → service → Environment:
+
+   ```
+   CORS_ORIGINS = https://dark-eyes-multiple08021016309-3260.vercel.app
+   ```
+
+That is it. `https://dark-eyes-multiple08021016309-3260.vercel.app` is now the
+single link you hand out: users land there, pick a code or a QR, get their
+Session ID, and take it to their own Render bot.
+
+### If something looks wrong
+
+| Symptom | Cause |
+| --- | --- |
+| page says "no bot backend is linked" | `config.json` still has `apiBaseUrl: ""` — run `npm run point:site` |
+| browser console CORS error | `CORS_ORIGINS` on the pairing service does not match the site origin exactly (no trailing slash, must include `https://`) |
+| `409 This bot is already linked` | the pairing service has a `SESSION_ID` set — remove it, that service must stay unlinked |
+| first pairing request takes ~30–50 s | free instance was asleep; the page pings `/api/health` on load to wake it |
+| `GET /api/health` returns 200 locally but the site still fails | you pointed the site at `http://localhost:3000` — that address only exists on your own machine |

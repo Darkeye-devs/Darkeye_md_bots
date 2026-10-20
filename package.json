@@ -17,7 +17,8 @@
     "verify": "node scripts/check-syntax.js && node --test tests/ && node scripts/audit.js",
     "session": "node -e \"import('./src/core/session.js').then(async m=>{const s=await m.sessionSummary();console.log(s);process.exit(0)})\"",
     "assets": "node scripts/make-assets.js",
-    "deploy:vercel": "node scripts/deploy-vercel.js"
+    "deploy:vercel": "node scripts/deploy-vercel.js",
+    "point:site": "node scripts/point-site.js"
   },
   "keywords": [
     "whatsapp",

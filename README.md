@@ -112,6 +112,15 @@ Pairing on the public site is guarded: **6 requests per IP per hour**, one pairi
 at a time, a single-use `pairToken` before the Session ID is handed over, and
 abandoned pairings expire in 15 minutes.
 
+Connect the site to a pairing backend in one command:
+
+```bash
+npm run point:site https://your-pairing-service.onrender.com
+```
+
+Then set `CORS_ORIGINS` on that service to your site's origin. Full walkthrough
+with the two service blueprints: **[docs/VERCEL-SPLIT.md](docs/VERCEL-SPLIT.md)**.
+
 Point the page at your own bot with one visit — no rebuild:
 
 ```
