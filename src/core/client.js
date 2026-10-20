@@ -93,10 +93,35 @@ export async function createSocket({ phone = null } = {}) {
   })
 
   // Pairing code path: only valid before the account is registered.
+  //
+  // requestPairingCode() must not be called on a socket that is still opening —
+  // WhatsApp answers 428 "Connection Closed" and the whole pairing dies. The
+  // handshake is only complete once the server sends its first QR payload, so
+  // wait for that signal (or a timeout) before asking for a code, then retry a
+  // couple of times because the first attempt can still race the socket.
   if (phone && !authState.creds.registered) {
     try {
       setStatus('pairing', { pairingPhone: phone, pairingRequestedAt: Date.now() })
-      const code = await sock.requestPairingCode(phone)
+
+      let code = null
+      for (let attempt = 1; attempt <= 3 && !code; attempt++) {
+        // Wait for the handshake. 15s is generous; a warm connection is instant.
+        if (!state.qr) {
+          for (let i = 0; i < 60 && !state.qr; i++) {
+            await new Promise((r) => setTimeout(r, 250))
+          }
+        }
+        try {
+          code = await sock.requestPairingCode(phone)
+        } catch (error) {
+          state.lastError = error.message
+          logger.warn('pairing code attempt %d failed: %s', attempt, error.message)
+          await new Promise((r) => setTimeout(r, 1500 * attempt))
+        }
+      }
+
+      if (!code) throw new Error(state.lastError || 'WhatsApp did not issue a pairing code')
+
       state.pairingCode = code
       safeEmit('pairing-code', { code, phone })
       logger.info('pairing code issued for %s', phone)

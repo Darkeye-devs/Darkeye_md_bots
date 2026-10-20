@@ -105,3 +105,8 @@ test('cleanupPairings leaves fresh pairings alone', () => {
   assert.ok(view, 'a pairing created seconds ago must survive the sweeper')
   assert.ok(view.secondsLeft > 0)
 })
+
+test('CODE_TTL_MS exposes the real WhatsApp code lifetime (~60s)', () => {
+  assert.equal(pairingConfig.CODE_TTL_MS, 60_000)
+  assert.ok(pairingConfig.PAIR_TTL_MS > pairingConfig.CODE_TTL_MS, 'the record may outlive the code')
+})

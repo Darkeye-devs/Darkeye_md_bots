@@ -171,14 +171,18 @@ function showCode(code, secondsLeft) {
   box.innerHTML = `
     <span class="cap">WhatsApp → Linked devices → Link with phone number → enter this</span>
     <div class="code" id="code">${String(code).match(/.{1,4}/g)?.join('  ') ?? code}</div>
-    <div class="code-meta" id="meta">expires in ${secondsLeft}s</div>
+    <div class="code-meta" id="meta">code expires in ${Math.min(secondsLeft, 60)}s — enter it now</div>
   `
   out.appendChild(box)
   out.appendChild(
-    alertBox('warn', 'This code expires in about a minute. Keep this page open — the Session ID appears here the moment your phone links.')
+    alertBox(
+      'warn',
+      'Type the code into WhatsApp <b>straight away</b> — it dies after ~60 seconds. If it expires, request a new one (or use the QR tab, which keeps refreshing itself).'
+    )
   )
 
-  state.expiresAt = Date.now() + secondsLeft * 1000
+  // WhatsApp codes live about a minute; do not pretend otherwise.
+  state.expiresAt = Date.now() + Math.min(secondsLeft, 60) * 1000
   clearInterval(countdown)
   countdown = setInterval(() => {
     const left = Math.max(0, Math.round((state.expiresAt - Date.now()) / 1000))
@@ -255,7 +259,7 @@ function showQr(dataUrl, secondsLeft) {
   box.innerHTML = `
     <span class="cap">WhatsApp → Linked devices → Link a device → scan this</span>
     <img id="qr-img" alt="WhatsApp pairing QR code" src="${dataUrl}" />
-    <div class="code-meta" id="meta">expires in ${secondsLeft}s</div>
+    <div class="code-meta" id="meta">code expires in ${Math.min(secondsLeft, 60)}s — enter it now</div>
   `
   out.appendChild(box)
   out.appendChild(
@@ -265,7 +269,8 @@ function showQr(dataUrl, secondsLeft) {
     )
   )
 
-  state.expiresAt = Date.now() + secondsLeft * 1000
+  // WhatsApp codes live about a minute; do not pretend otherwise.
+  state.expiresAt = Date.now() + Math.min(secondsLeft, 60) * 1000
   clearInterval(countdown)
   countdown = setInterval(() => {
     const left = Math.max(0, Math.round((state.expiresAt - Date.now()) / 1000))

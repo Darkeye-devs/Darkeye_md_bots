@@ -16,6 +16,12 @@ const logger = log('pairing')
  */
 
 const PAIR_TTL_MS = 5 * 60_000
+/**
+ * WhatsApp pairing codes are only good for about a minute. The pairing *record*
+ * may live longer (the browser keeps polling), but the code itself must be
+ * entered fast — so the countdown shown to users uses this, not PAIR_TTL_MS.
+ */
+const CODE_TTL_MS = 60_000
 const RATE_LIMIT = { windowMs: 60 * 60_000, max: 6 }
 
 /** phone -> pair session (8-digit code flow) */
@@ -78,6 +84,7 @@ export async function startPublicPairing(phone) {
     pairToken: token(),
     createdAt: Date.now(),
     expiresAt: Date.now() + PAIR_TTL_MS,
+    codeIssuedAt: null,
     code: state.pairingCode,
     claimed: false
   }
@@ -88,6 +95,7 @@ export async function startPublicPairing(phone) {
     await new Promise((r) => setTimeout(r, 250))
   }
   record.code = state.pairingCode
+  record.codeIssuedAt = state.pairingCode ? Date.now() : null
 
   if (!record.code) {
     // Nothing came back: release the socket so the next attempt is not blocked.
@@ -116,6 +124,11 @@ export function getPublicPairing(phone) {
     code: record.code ?? state.pairingCode,
     expiresAt: record.expiresAt,
     secondsLeft: Math.max(0, Math.ceil((record.expiresAt - Date.now()) / 1000)),
+    // How long the *code* is still good for — this is what the UI counts down.
+    codeSecondsLeft: record.codeIssuedAt
+      ? Math.max(0, Math.ceil((record.codeIssuedAt + CODE_TTL_MS - Date.now()) / 1000))
+      : 0,
+    codeExpired: Boolean(record.codeIssuedAt && Date.now() > record.codeIssuedAt + CODE_TTL_MS),
     status: connected ? 'connected' : state.status,
     connected,
     number: connected ? phone : null
@@ -239,7 +252,7 @@ export function cleanupPairings() {
   }
 }
 
-export const pairingConfig = { PAIR_TTL_MS, RATE_LIMIT }
+export const pairingConfig = { PAIR_TTL_MS, CODE_TTL_MS, RATE_LIMIT }
 export default {
   startPublicPairing,
   getPublicPairing,

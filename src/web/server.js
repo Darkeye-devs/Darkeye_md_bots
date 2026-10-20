@@ -131,7 +131,10 @@ export function createServer() {
         pairToken: record.pairToken,
         expiresAt: record.expiresAt,
         secondsLeft: Math.max(0, Math.ceil((record.expiresAt - Date.now()) / 1000)),
-        instructions: 'WhatsApp → Linked devices → Link with phone number → enter the code.'
+        // The code itself dies after ~60s, even though the pairing record lasts longer.
+        codeSecondsLeft: 60,
+        instructions:
+          'WhatsApp → Linked devices → Link with phone number → enter the code. Act fast: the code expires in about a minute.'
       })
     } catch (error) {
       res.status(error.status ?? 500).json({ ok: false, error: error.message })
