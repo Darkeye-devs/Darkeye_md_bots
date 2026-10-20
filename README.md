@@ -112,6 +112,9 @@ Pairing on the public site is guarded: **6 requests per IP per hour**, one pairi
 at a time, a single-use `pairToken` before the Session ID is handed over, and
 abandoned pairings expire in 15 minutes.
 
+No card available? Railway takes 30 seconds and needs no payment method —
+see **[docs/PAIRING-WITHOUT-CARD.md](docs/PAIRING-WITHOUT-CARD.md)**.
+
 Connect the site to a pairing backend in one command:
 
 ```bash
