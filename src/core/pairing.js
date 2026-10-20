@@ -18,8 +18,10 @@ const logger = log('pairing')
 const PAIR_TTL_MS = 5 * 60_000
 const RATE_LIMIT = { windowMs: 60 * 60_000, max: 6 }
 
-/** phone -> pair session */
+/** phone -> pair session (8-digit code flow) */
 const sessions = new Map()
+/** pairingId -> pair session (QR flow — there is no phone number to key on yet) */
+const qrSessions = new Map()
 /** ip -> timestamps[] */
 const rateBuckets = new Map()
 
@@ -45,11 +47,14 @@ export function pairingBusy() {
   const now = Date.now()
   // Busy if a session is live OR was created in the last minute — a request that
   // has not produced a code yet is still holding the single WhatsApp socket.
-  const active = [...sessions.values()].find(
-    (s) => now < s.expiresAt && (s.code || now - s.createdAt < 60_000)
+  const active = [...sessions.values(), ...qrSessions.values()].find(
+    (s) => now < s.expiresAt && (s.code || s.dataUrl || now - s.createdAt < 90_000)
   )
   if (active) {
-    const wait = Math.max(5, Math.ceil(((active.code ? active.expiresAt : active.createdAt + 60_000) - now) / 1000))
+    const deadline = active.code || active.dataUrl
+      ? active.expiresAt
+      : active.createdAt + 90_000
+    const wait = Math.max(5, Math.ceil((deadline - now) / 1000))
     return `Another pairing is in progress. Try again in ${wait}s.`
   }
   return null
@@ -135,12 +140,113 @@ export async function claimSession(phone, pairToken) {
   return sessionId
 }
 
+// ── QR flow ─────────────────────────────────
+// Some numbers never receive an 8-digit code (WhatsApp hides it for accounts
+// with two-step verification quirks, and it can simply time out). The QR path
+// exists so those users are not stuck: the page shows the same QR the phone
+// would scan in Settings → Linked devices.
+
+/**
+ * Store a freshly generated QR. Split out from startPublicQrPairing so the
+ * lifecycle can be tested without opening a socket.
+ */
+export function registerQrPairing(dataUrl) {
+  const record = {
+    pairingId: crypto.randomUUID(),
+    qrToken: token(),
+    createdAt: Date.now(),
+    expiresAt: Date.now() + PAIR_TTL_MS,
+    dataUrl,
+    claimed: false
+  }
+  qrSessions.set(record.pairingId, record)
+  return record
+}
+
+/** Public, secret-free view of a QR pairing. `snapshot` defaults to live state. */
+export function readQrPairing(pairingId, snapshot = state) {
+  const record = qrSessions.get(pairingId)
+  if (!record) return null
+
+  const connected = snapshot.status === 'connected'
+  return {
+    pairingId: record.pairingId,
+    status: connected ? 'connected' : snapshot.status,
+    connected,
+    // WhatsApp rotates the QR roughly every 20s; hand back the newest one.
+    dataUrl: connected ? null : snapshot.qrDataUrl ?? record.dataUrl,
+    expiresAt: record.expiresAt,
+    secondsLeft: Math.max(0, Math.ceil((record.expiresAt - Date.now()) / 1000))
+  }
+}
+
+/**
+ * Hand over the Session ID for a QR pairing. Same single-use token rule as the
+ * code flow: only the browser that started the pairing can collect it.
+ */
+export async function claimQrSession(pairingId, qrToken, { exporter = exportSession, snapshot = state } = {}) {
+  const record = qrSessions.get(pairingId)
+  if (!record) throw Object.assign(new Error('No QR pairing found. Start again.'), { status: 404 })
+  if (record.claimed) throw Object.assign(new Error('This session was already claimed.'), { status: 410 })
+  if (qrToken !== record.qrToken) throw Object.assign(new Error('Wrong pairing token.'), { status: 403 })
+  if (snapshot.status !== 'connected') {
+    throw Object.assign(new Error('Not connected yet — scan the QR in WhatsApp first.'), { status: 409 })
+  }
+
+  const sessionId = await exporter()
+  record.claimed = true
+  qrSessions.delete(pairingId)
+  logger.info('session claimed via QR')
+  return sessionId
+}
+
+/** Open a socket in QR mode and wait for WhatsApp's first QR image. */
+export async function startPublicQrPairing() {
+  const busy = pairingBusy()
+  if (busy) throw Object.assign(new Error(busy), { status: 409 })
+
+  cancelReconnect()
+  await disconnect()
+  state.qrDataUrl = null
+  await connect({ fresh: true }) // no phone -> Baileys asks for a QR
+
+  for (let i = 0; i < 80 && !state.qrDataUrl; i++) {
+    await new Promise((r) => setTimeout(r, 250))
+  }
+
+  if (!state.qrDataUrl) {
+    await disconnect()
+    logger.warn('no QR returned by WhatsApp')
+    throw Object.assign(
+      new Error('WhatsApp did not return a QR code. Try again in a minute, or use the 8-digit code instead.'),
+      { status: 422, noQr: true }
+    )
+  }
+
+  const record = registerQrPairing(state.qrDataUrl)
+  logger.info('public QR pairing started')
+  return record
+}
+
+
 export function cleanupPairings() {
   const now = Date.now()
   for (const [phone, record] of sessions) {
     if (now > record.expiresAt + 10 * 60_000) sessions.delete(phone)
   }
+  for (const [id, record] of qrSessions) {
+    if (now > record.expiresAt + 10 * 60_000) qrSessions.delete(id)
+  }
 }
 
 export const pairingConfig = { PAIR_TTL_MS, RATE_LIMIT }
-export default { startPublicPairing, getPublicPairing, claimSession, rateLimited, cleanupPairings }
+export default {
+  startPublicPairing,
+  getPublicPairing,
+  claimSession,
+  startPublicQrPairing,
+  readQrPairing,
+  claimQrSession,
+  rateLimited,
+  cleanupPairings
+}

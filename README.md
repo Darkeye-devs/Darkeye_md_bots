@@ -26,7 +26,7 @@
 
 <img src="https://img.shields.io/badge/COMMANDS-249-22D3EE?style=flat-square&labelColor=0b0f16" />
 <img src="https://img.shields.io/badge/ALIASES-211-8B5CF6?style=flat-square&labelColor=0b0f16" />
-<img src="https://img.shields.io/badge/TESTS-60%20passing-34D399?style=flat-square&labelColor=0b0f16" />
+<img src="https://img.shields.io/badge/TESTS-81%20passing-34D399?style=flat-square&labelColor=0b0f16" />
 <img src="https://img.shields.io/badge/LOAD%20FAILURES-0-F472B6?style=flat-square&labelColor=0b0f16" />
 <img src="https://img.shields.io/badge/NODE-20%2B-339933?style=flat-square&logo=node.js&logoColor=white&labelColor=0b0f16" />
 <img src="https://img.shields.io/badge/LICENSE-MIT-22D3EE?style=flat-square&labelColor=0b0f16" />
@@ -45,7 +45,7 @@ Most bot repos advertise *"1000+ commands"* and quietly ship a few hundred alias
 
 > **A command only exists if it has working code behind it.**
 
-That rule is not a slogan — it is enforced by the loader, measured by an audit script, and proven by 60 tests that execute the real command functions.
+That rule is not a slogan — it is enforced by the loader, measured by an audit script, and proven by 81 tests that execute the real command functions.
 
 <br/>
 
@@ -94,6 +94,8 @@ No terminal. No permanent disk. No QR stuck on a server log.
 
 The repo is built for it. `landing/` is a standalone Vite site that talks to the
 bot's API over HTTPS, so you can give users a page instead of a raw panel.
+Users pair with **either an 8-digit code or a QR scan** — their choice — and both
+paths end in the same Session ID.
 
 A live instance of exactly this setup: **https://dark-eyes-multiple08021016309-3260.vercel.app**
 

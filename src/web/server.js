@@ -8,7 +8,16 @@ import { registryStats, capabilities } from '../core/registry.js'
 import { summary } from '../services/database.js'
 import { sessionExists, pairedNumber } from '../core/auth.js'
 import { exportSession, importSession, sessionSummary } from '../core/session.js'
-import { startPublicPairing, getPublicPairing, claimSession, rateLimited, cleanupPairings } from '../core/pairing.js'
+import {
+  startPublicPairing,
+  getPublicPairing,
+  claimSession,
+  startPublicQrPairing,
+  readQrPairing,
+  claimQrSession,
+  rateLimited,
+  cleanupPairings
+} from '../core/pairing.js'
 import { connect, disconnect } from '../core/client.js'
 import { resetSession } from '../core/auth.js'
 import { isValidPhone, sanitizePhone } from '../lib/jid.js'
@@ -133,6 +142,45 @@ export function createServer() {
     const record = getPublicPairing(sanitizePhone(req.params.phone))
     if (!record) return res.status(404).json({ ok: false, error: 'No active pairing for that number.' })
     res.json({ ok: true, ...record })
+  })
+
+  // ── PUBLIC QR pairing (the "scan instead" tab on the landing page) ──
+  app.post('/api/public/qr', async (req, res) => {
+    if (rateLimited(req.ip ?? 'unknown')) {
+      return res.status(429).json({ ok: false, error: 'Too many pairing attempts from this address. Try again later.' })
+    }
+
+    try {
+      const record = await startPublicQrPairing()
+      res.json({
+        ok: true,
+        pairingId: record.pairingId,
+        qrToken: record.qrToken,
+        dataUrl: record.dataUrl,
+        expiresAt: record.expiresAt,
+        secondsLeft: Math.max(0, Math.ceil((record.expiresAt - Date.now()) / 1000)),
+        instructions: 'WhatsApp → Linked devices → Link a device → scan this code.'
+      })
+    } catch (error) {
+      res.status(error.status ?? 500).json({ ok: false, error: error.message })
+    }
+  })
+
+  app.get('/api/public/qr/:pairingId', (req, res) => {
+    const record = readQrPairing(String(req.params.pairingId))
+    if (!record) return res.status(404).json({ ok: false, error: 'This QR pairing expired. Start a new one.' })
+    res.json({ ok: true, ...record })
+  })
+
+  app.post('/api/public/session/qr', async (req, res) => {
+    const pairingId = String(req.body?.pairingId ?? '')
+    const qrToken = String(req.body?.qrToken ?? '')
+    try {
+      const sessionId = await claimQrSession(pairingId, qrToken)
+      res.json({ ok: true, sessionId })
+    } catch (error) {
+      res.status(error.status ?? 500).json({ ok: false, error: error.message })
+    }
   })
 
   app.post('/api/public/session', async (req, res) => {

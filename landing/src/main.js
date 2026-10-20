@@ -64,21 +64,37 @@ app.innerHTML = `
     <div class="chips">
       <span class="chip"><b>249</b> commands</span>
       <span class="chip"><b>211</b> aliases</span>
-      <span class="chip"><b>60</b> tests passing</span>
+      <span class="chip"><b>81</b> tests passing</span>
       <span class="chip"><b>0</b> fake features</span>
       <span class="chip"><b>2</b> values to deploy</span>
     </div>
 
     <div class="card" id="pair">
       <h2>Link your WhatsApp</h2>
-      <p class="lede">Enter your number, then type the code into WhatsApp. Nothing is stored on this page.</p>
+      <p class="lede">Two ways in — pick whichever your phone gives you. Nothing is stored on this page.</p>
 
-      <label for="phone">WhatsApp number</label>
-      <div class="field">
-        <input id="phone" type="tel" inputmode="numeric" placeholder="2348012345678" autocomplete="off" />
-        <button id="go" class="primary">Get pairing code</button>
+      <div id="notice"></div>
+
+      <div class="tabs" role="tablist">
+        <button class="tab active" id="tab-code" role="tab" aria-selected="true">8-digit code</button>
+        <button class="tab" id="tab-qr" role="tab" aria-selected="false">QR code</button>
       </div>
-      <p class="hint">Country code first, digits only. No <code>+</code>, no spaces.</p>
+
+      <div id="pane-code">
+        <label for="phone">WhatsApp number</label>
+        <div class="field">
+          <input id="phone" type="tel" inputmode="numeric" placeholder="2348012345678" autocomplete="off" />
+          <button id="go" class="primary">Get pairing code</button>
+        </div>
+        <p class="hint">Country code first, digits only. No <code>+</code>, no spaces.</p>
+      </div>
+
+      <div id="pane-qr" hidden>
+        <p class="hint" style="margin:0 0 12px">
+          No number needed. Open <b>WhatsApp → Linked devices → Link a device</b>, then scan.
+        </p>
+        <button id="go-qr" class="primary wide">Show QR code</button>
+      </div>
 
       <div id="out"></div>
     </div>
@@ -120,6 +136,7 @@ const out = $('#out')
 let poll = null
 let countdown = null
 let state = { phone: null, pairToken: null, expiresAt: 0 }
+let qr = { pairingId: null, qrToken: null }
 
 function clearTimers() {
   clearInterval(poll)
@@ -229,6 +246,94 @@ function showSession(sessionId) {
   })
 }
 
+function showQr(dataUrl, secondsLeft) {
+  out.innerHTML = ''
+  const box = document.createElement('div')
+  box.className = 'qr-box'
+  box.innerHTML = `
+    <span class="cap">WhatsApp → Linked devices → Link a device → scan this</span>
+    <img id="qr-img" alt="WhatsApp pairing QR code" src="${dataUrl}" />
+    <div class="code-meta" id="meta">expires in ${secondsLeft}s</div>
+  `
+  out.appendChild(box)
+  out.appendChild(
+    alertBox(
+      'warn',
+      'The QR refreshes itself every few seconds. Keep this page open — your Session ID appears here the moment the scan is accepted.'
+    )
+  )
+
+  state.expiresAt = Date.now() + secondsLeft * 1000
+  clearInterval(countdown)
+  countdown = setInterval(() => {
+    const left = Math.max(0, Math.round((state.expiresAt - Date.now()) / 1000))
+    const meta = document.getElementById('meta')
+    if (!meta) return
+    meta.textContent = left > 0 ? `expires in ${left}s` : 'QR expired — get a new one'
+    if (left <= 0) clearInterval(countdown)
+  }, 1000)
+}
+
+function startQrPolling() {
+  clearInterval(poll)
+  poll = setInterval(async () => {
+    try {
+      const status = await call(`/api/public/qr/${qr.pairingId}`)
+
+      if (status.connected) {
+        clearTimers()
+        out.innerHTML = ''
+        out.appendChild(alertBox('ok', '📱 Device linked. Generating your Session ID…'))
+
+        const { sessionId } = await call('/api/public/session/qr', {
+          method: 'POST',
+          body: JSON.stringify({ pairingId: qr.pairingId, qrToken: qr.qrToken })
+        })
+
+        if (sessionId) showSession(sessionId)
+        else out.appendChild(alertBox('warn', 'Linked, but WhatsApp did not hand back a session. Try again.'))
+        return
+      }
+
+      // WhatsApp rotates the QR every ~20s — swap the image in place.
+      if (status.dataUrl) {
+        const img = document.getElementById('qr-img')
+        if (img && img.src !== status.dataUrl) img.src = status.dataUrl
+      }
+
+      if (status.secondsLeft <= 0) {
+        clearTimers()
+        const meta = document.getElementById('meta')
+        if (meta) meta.textContent = 'QR expired — get a new one'
+      }
+    } catch {
+      /* keep polling; the backend may be waking up */
+    }
+  }, 2500)
+}
+
+async function requestQr() {
+  const button = $('#go-qr')
+  button.disabled = true
+  button.textContent = 'Opening…'
+  out.innerHTML = ''
+  out.appendChild(alertBox('ok', 'Opening a socket and asking WhatsApp for a QR… (a cold free-tier instance can take ~30s)'))
+
+  try {
+    const data = await call('/api/public/qr', { method: 'POST' })
+    qr = { pairingId: data.pairingId, qrToken: data.qrToken }
+    showQr(data.dataUrl, data.secondsLeft)
+    startQrPolling()
+  } catch (error) {
+    out.innerHTML = ''
+    out.appendChild(alertBox('error', error.message))
+    out.appendChild(alertBox('warn', 'You can switch to the 8-digit code tab instead — it works even when QR does not.'))
+  } finally {
+    button.disabled = false
+    button.textContent = 'Show QR code'
+  }
+}
+
 function startPolling() {
   clearInterval(poll)
   poll = setInterval(async () => {
@@ -305,8 +410,9 @@ async function boot() {
   // A localhost fallback on a deployed site means nobody configured the backend.
   const looksLocal = API.includes('localhost') || API.includes('127.0.0.1')
   if (looksLocal && !['localhost', '127.0.0.1'].includes(location.hostname)) {
-    out.innerHTML = ''
-    out.appendChild(
+    const notice = $('#notice')
+    notice.innerHTML = ''
+    notice.appendChild(
       alertBox(
         'warn',
         `Pairing is not switched on yet — no bot backend is linked to this site.
@@ -324,6 +430,23 @@ async function boot() {
   $('#phone').addEventListener('keydown', (event) => {
     if (event.key === 'Enter') requestCode()
   })
+  $('#go-qr').addEventListener('click', requestQr)
+
+  const selectTab = (which) => {
+    const isCode = which === 'code'
+    $('#tab-code').classList.toggle('active', isCode)
+    $('#tab-qr').classList.toggle('active', !isCode)
+    $('#tab-code').setAttribute('aria-selected', String(isCode))
+    $('#tab-qr').setAttribute('aria-selected', String(!isCode))
+    $('#pane-code').hidden = !isCode
+    $('#pane-qr').hidden = isCode
+    // Switching modes abandons the previous attempt, so stop its timers.
+    clearTimers()
+    out.innerHTML = ''
+  }
+
+  $('#tab-code').addEventListener('click', () => selectTab('code'))
+  $('#tab-qr').addEventListener('click', () => selectTab('qr'))
 }
 
 boot()
