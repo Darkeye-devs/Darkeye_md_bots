@@ -9,6 +9,7 @@ import { ffmpegAvailable } from './services/sticker.js'
 import * as scheduler from './services/scheduler.js'
 import { startServer } from './web/server.js'
 import { sessionExists } from './core/auth.js'
+import { hydrateFromEnv, sessionFromEnv } from './core/session.js'
 
 const banner = `
   ██████╗  █████╗ ██████╗ ██╗  ██╗    ███████╗██╗   ██╗███████╗███████╗
@@ -65,6 +66,17 @@ async function main() {
   await startServer()
 
   // ── whatsapp connection ────────────────────
+  // Hosts without a disk send SESSION_ID: rebuild the auth folder FIRST,
+  // otherwise the boot check below thinks we are unpaired and never connects.
+  if (sessionFromEnv()) {
+    const hydration = await hydrateFromEnv()
+    logger.info(
+      'SESSION_ID %s%s',
+      hydration.hydrated ? `restored → ${hydration.number}` : `not used (${hydration.reason})`,
+      ''
+    )
+  }
+
   state.hasSession = await sessionExists()
   if (state.hasSession) {
     logger.info('existing session found — connecting…')

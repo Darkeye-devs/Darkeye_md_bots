@@ -4,7 +4,7 @@
  */
 
 const $ = (sel) => document.querySelector(sel)
-const state = { connected: false, countdownTimer: null, codeDeadline: null }
+const state = { connected: false, countdownTimer: null, codeDeadline: null, sessionLoaded: false }
 
 // ── helpers ─────────────────────────────────
 const fmtDuration = (ms = 0) => {
@@ -35,13 +35,40 @@ function showError(message) {
   box.hidden = false
 }
 
+/**
+ * Panel token, if the owner locked the panel.
+ * Accept it from the URL once (?token=…) and remember it — hosting dashboards
+ * are the usual place people copy it from.
+ */
+function panelToken() {
+  const fromUrl = new URLSearchParams(location.search).get('token')
+  if (fromUrl) {
+    localStorage.setItem('darkeyes_panel_token', fromUrl)
+    // keep the token out of the address bar / history
+    const clean = location.pathname + location.hash
+    history.replaceState({}, '', clean)
+    return fromUrl
+  }
+  return localStorage.getItem('darkeyes_panel_token') ?? ''
+}
+
 async function api(path, options = {}) {
+  const token = panelToken()
   const res = await fetch(path, {
-    headers: { 'content-type': 'application/json', ...(options.headers ?? {}) },
+    headers: {
+      'content-type': 'application/json',
+      ...(token ? { 'x-panel-token': token } : {}),
+      ...(options.headers ?? {})
+    },
     ...options
   })
   const data = await res.json().catch(() => ({}))
-  if (!res.ok) throw new Error(data.error ?? `Request failed (${res.status})`)
+  if (!res.ok) {
+    if (data.tokenRequired) {
+      throw new Error('This panel is locked. Open it as /?token=YOUR_PANEL_TOKEN (find the token in your host’s environment variables).')
+    }
+    throw new Error(data.error ?? `Request failed (${res.status})`)
+  }
   return data
 }
 
@@ -70,6 +97,13 @@ function renderStatus(data) {
 
   if (data.pairingCode && data.status !== 'connected') {
     showCode(data.pairingCode, data.pairingRequestedAt)
+  }
+
+  // session card only makes sense once paired
+  const sessionCard = $('#session-card')
+  if (sessionCard) {
+    sessionCard.hidden = !state.connected
+    if (state.connected && !state.sessionLoaded) loadSession()
   }
 
   if (data.capabilities) {
@@ -206,6 +240,67 @@ function connectEvents() {
   }
 }
 
+// ── session id ──────────────────────────────
+async function loadSession() {
+  const box = $('#session-id')
+  if (!box) return
+  state.sessionLoaded = true
+  box.value = 'Generating Session ID…'
+  try {
+    const data = await api('/api/session')
+    box.value = data.sessionId
+  } catch (error) {
+    box.value = ''
+    box.placeholder = error.message
+    state.sessionLoaded = false
+  }
+}
+
+async function copySession() {
+  const value = $('#session-id').value
+  if (!value) return
+  try {
+    await navigator.clipboard.writeText(value)
+    const btn = $('#btn-copy-session')
+    const original = btn.textContent
+    btn.textContent = '✅ Copied'
+    setTimeout(() => (btn.textContent = original), 1800)
+  } catch {
+    // clipboard API blocked (insecure context) — select it so Ctrl+C works
+    $('#session-id').select()
+  }
+}
+
+function downloadSession() {
+  const value = $('#session-id').value
+  if (!value) return
+  const blob = new Blob([`SESSION_ID=${value}\n`], { type: 'text/plain' })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = 'dark-eyes-session.txt'
+  link.click()
+  URL.revokeObjectURL(link.href)
+}
+
+async function loadSessionFromInput() {
+  const value = $('#session-input').value.trim()
+  if (!value) return
+  const btn = $('#btn-load-session')
+  btn.disabled = true
+  btn.textContent = 'Loading…'
+  try {
+    await api('/api/session', { method: 'POST', body: JSON.stringify({ sessionId: value }) })
+    $('#session-input').value = ''
+    state.sessionLoaded = false
+    showError('')
+  } catch (error) {
+    showError(error.message)
+  } finally {
+    btn.disabled = false
+    btn.textContent = 'Load session'
+  }
+}
+
 // ── boot ────────────────────────────────────
 function initTabs() {
   document.querySelectorAll('.tab').forEach((tab) => {
@@ -224,6 +319,9 @@ async function boot() {
   $('#phone').addEventListener('keydown', (e) => e.key === 'Enter' && requestPairCode())
   $('#btn-qr').addEventListener('click', requestQr)
   $('#btn-logout').addEventListener('click', logout)
+  $('#btn-copy-session')?.addEventListener('click', copySession)
+  $('#btn-download-session')?.addEventListener('click', downloadSession)
+  $('#btn-load-session')?.addEventListener('click', loadSessionFromInput)
 
   try {
     renderStatus(await api('/api/status'))

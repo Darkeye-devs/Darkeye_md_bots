@@ -1,6 +1,6 @@
 # Dark Eyes — command audit
 
-Generated 2026-10-20T16:32:36.659Z from `docs/command-target-list.md`
+Generated 2026-10-20T18:13:09.973Z from `docs/command-target-list.md`
 
 ## The headline
 
@@ -16,11 +16,11 @@ So of the 1000 names on that list, **402 do real work today**. The other 598 are
 
 | Live registry | Count |
 | --- | ---: |
-| Registered commands | 248 |
-| Registered aliases | 209 |
-| Plugin files | 18 |
+| Registered commands | 249 |
+| Registered aliases | 211 |
+| Plugin files | 19 |
 | Plugin load failures | 0 |
-| Commands we built that are NOT on the target list | 35 |
+| Commands we built that are NOT on the target list | 36 |
 
 ## Per section
 
@@ -104,4 +104,4 @@ So of the 1000 names on that list, **402 do real work today**. The other 598 are
 
 ## Bonus: live commands not on the target list
 
-`forget` · `resolve` · `platforms` · `buy` · `richlist` · `move` · `quote` · `cmd` · `shownote` · `todos` · `afklist` · `delete` · `badword` · `anticall` · `guardstatus` · `rmwarn` · `mode` · `reload` · `restart` · `joingroup` · `leavegroup` · `textmaker` · `base64` · `binary` · `hex` · `roman` · `words` · `count` · `upper` · `lower` · `reverse` · `title` · `passwordcheck` · `bmi` · `rates`
+`forget` · `resolve` · `platforms` · `buy` · `richlist` · `move` · `quote` · `cmd` · `session` · `shownote` · `todos` · `afklist` · `delete` · `badword` · `anticall` · `guardstatus` · `rmwarn` · `mode` · `reload` · `restart` · `joingroup` · `leavegroup` · `textmaker` · `base64` · `binary` · `hex` · `roman` · `words` · `count` · `upper` · `lower` · `reverse` · `title` · `passwordcheck` · `bmi` · `rates`

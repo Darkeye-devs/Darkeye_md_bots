@@ -26,6 +26,8 @@ const DEAD_SESSION_CODES = new Set([
  * @param {{ onReconnect?: () => void }} hooks
  */
 export function bindSocket(sock, hooks = {}) {
+  // Ignore events from a socket that is no longer the active one.
+  const isCurrent = () => state.sock === sock
   sock.ev.on('connection.update', async (update) => {
     const { connection, lastDisconnect, qr } = update
 
@@ -67,6 +69,7 @@ export function bindSocket(sock, hooks = {}) {
       safeEmit('status', { status: 'disconnected', code, reason })
 
       if (DEAD_SESSION_CODES.has(code)) {
+        if (!isCurrent()) return
         setStatus('disconnected', { me: null })
         logger.error('WhatsApp rejected this session (%s). Reset the session from the panel to pair again.', reason)
         try {
@@ -78,6 +81,7 @@ export function bindSocket(sock, hooks = {}) {
         return
       }
 
+      if (!isCurrent()) return
       setStatus('disconnected', { me: null })
       hooks.onReconnect?.()
     }

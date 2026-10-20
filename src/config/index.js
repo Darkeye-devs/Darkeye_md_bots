@@ -48,6 +48,8 @@ export const config = {
   dbPath: resolve(str(process.env.DB_PATH, 'data/darkeyes.db')),
   backupDir: resolve('backups'),
   logLevel: str(process.env.LOG_LEVEL, 'info'),
+  // Session ID from the host (Render/Koyeb/Railway) — rebuilt on every boot.
+  sessionId: str(process.env.SESSION_ID || process.env.SESSION || process.env.BASE64_SESSION, ''),
   isProduction: process.env.NODE_ENV === 'production',
 
   ai: {

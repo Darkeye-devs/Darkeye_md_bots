@@ -3,11 +3,15 @@ import path from 'node:path'
 import { useMultiFileAuthState } from '@whiskeysockets/baileys'
 import { config } from '../config/index.js'
 import { log } from './logger.js'
+import { hydrateFromEnv } from './session.js'
 
 const logger = log('auth')
 
 export async function loadAuthState() {
   await fs.mkdir(config.sessionDir, { recursive: true })
+  // Hosts like Render wipe the disk on every deploy: rebuild the folder from
+  // SESSION_ID before Baileys reads it, so the bot comes back already paired.
+  await hydrateFromEnv()
   return useMultiFileAuthState(config.sessionDir)
 }
 

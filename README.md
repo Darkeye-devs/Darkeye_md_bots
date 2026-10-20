@@ -2,9 +2,31 @@
 
 **the eye that sees**
 
-A WhatsApp bot built the honest way: **248 commands that actually run**, a browser pairing panel (QR *or* 8-digit code), a plugin engine that validates itself, and an audit script that proves the numbers.
+A WhatsApp **MD bot** you can host in five minutes: 248 commands that actually run,
+a browser pairing panel (QR *or* 8-digit code), and a **Session ID** so your host
+never logs you out — even on free tiers that wipe the disk.
 
-No "1,000 commands" list padded with aliases and dead buttons.
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Darkeye-devs/Darkeye_md_bots)
+
+![Dark Eyes pairing panel](docs/screenshot.png)
+
+### Host it in 3 steps
+
+| # | Do this | Where |
+| --- | --- | --- |
+| 1 | Pair your number once and **copy the Session ID** | the panel (`/`) |
+| 2 | Click **Deploy to Render** and paste `SESSION_ID` + `OWNER_NUMBER` | Render |
+| 3 | Send `.menu` from your number | WhatsApp |
+
+No terminal. No QR on a server. No persistent disk needed — the Session ID rebuilds
+the login on every boot. Full walkthrough: **[docs/HOSTING.md](docs/HOSTING.md)**.
+
+> ⚠️ A Session ID is your WhatsApp account. Never post it, never commit it, never
+> show it in a tutorial screenshot.
+
+---
+
+## For developers
 
 ```
 ╭──────────────────────────────╮
@@ -132,7 +154,7 @@ Run `.menu` in WhatsApp, or read the generated reference: [`docs/COMMANDS.md`](d
 | Owner | 16 | mode, broadcast, backup, reload, restart, block, join, shell, eval |
 | Misc | 15 | reminders, notes, to-do, AFK, timer |
 | Economy | 13 | daily, work, fish, mine, bank, pay, rob, gamble, shop, inventory, richlist |
-| General | 11 | menu, ping, stats, info, me, rules |
+| General | 11 | menu, ping, stats, info, me, rules, **session** (owner: get your Session ID) |
 | AI | 10 | ai chat (per-chat memory), summarize, translate, imagine, describe, forget |
 
 ---
@@ -148,33 +170,40 @@ Run `.menu` in WhatsApp, or read the generated reference: [`docs/COMMANDS.md`](d
 | `npm run audit` | Compare a target command list with the live registry → `docs/AUDIT.md` |
 | `npm run docs` | Regenerate `docs/COMMANDS.md` from the registry |
 | `npm run verify` | Syntax + tests + audit in one go |
+| `node src/index.js` with `SESSION_ID` set | Boot already paired (what hosts do) |
 
 ---
 
 ## Deploying 24/7
 
-**pm2** (simplest on a VPS):
+One-click config is in the repo for every major host:
 
-```bash
-npm install -g pm2
-pm2 start ecosystem.config.cjs
-pm2 save && pm2 startup
+| Host | File | Notes |
+| --- | --- | --- |
+| **Render** | `render.yaml` | blueprint prompts for `SESSION_ID` + `OWNER_NUMBER` only |
+| **Koyeb** | `koyeb.yaml` | free instance, set `PORT=8000` |
+| **Railway** | `railway.json` | variables tab for the two secrets |
+| **Heroku-style** | `app.json` + `Procfile` | `heroku config:set …` |
+| **Docker/VPS** | `Dockerfile` | includes ffmpeg, volume `/app/data` |
+| **pm2** | `ecosystem.config.cjs` | `pm2 start ecosystem.config.cjs` |
+
+### How SESSION_ID works
+
+```
+panel pairs once ──► auth folder ──► bundled to base64 ──► SESSION_ID
+                                                              │
+host boots ──► hydrateFromEnv() ──► writes data/auth ──► Baileys connects
 ```
 
-**Docker:**
+- `src/core/session.js` exports/imports the whole auth folder.
+- On boot, `loadAuthState()` rebuilds the folder **before** Baileys reads it.
+- Pasted strings are cleaned automatically (quotes, newlines, stray prefixes).
+- A local `data/auth` folder still wins if one exists, so nothing breaks when
+  you run it on a laptop with a disk.
 
-```bash
-docker compose up -d --build
-docker compose logs -f
-```
-
-The Docker image installs `ffmpeg` for you. `data/` is a mounted volume so your session and database survive rebuilds.
-
-> ⚠️ **Security:** if the panel is reachable from the internet, set `PANEL_TOKEN` in `.env`. Without it, anyone who can open the port can pair a number or wipe your session. Better still, keep the panel bound to localhost and use an SSH tunnel.
-
-Details: [`docs/DEPLOY.md`](docs/DEPLOY.md).
-
----
+> ⚠️ **Security:** if the panel is reachable from the internet, set `PANEL_TOKEN`.
+> Open the panel once as `/?token=YOUR_TOKEN` — it is stored and stripped from the
+> address bar. Without it, anyone with the URL can pair a number or wipe your session.
 
 ## What this bot deliberately does NOT do
 

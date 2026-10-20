@@ -19,6 +19,26 @@ let reconnectTimer = null
 let connecting = false
 const MAX_BACKOFF_MS = 30_000
 
+/** Close a socket and strip its listeners so it cannot resurrect itself. */
+function teardown(sock) {
+  if (!sock) return
+  try {
+    sock.ev.removeAllListeners('connection.update')
+    sock.ev.removeAllListeners('creds.update')
+    sock.ev.removeAllListeners('messages.upsert')
+    sock.ev.removeAllListeners('group-participants.update')
+    sock.ev.removeAllListeners('call')
+    sock.ev.removeAllListeners('messages.reaction')
+  } catch {
+    /* listener registry already gone */
+  }
+  try {
+    sock.end(undefined)
+  } catch {
+    /* socket already closed */
+  }
+}
+
 async function resolveVersion() {
   try {
     const { version, isLatest } = await fetchLatestBaileysVersion()
@@ -59,7 +79,9 @@ export async function createSocket({ phone = null } = {}) {
   })
 
   state.sock = sock
-  bindSocket(sock, { onReconnect: () => connect() })
+  // Always route reconnects through the backoff scheduler — calling connect()
+  // directly here causes an unthrottled reconnect storm.
+  bindSocket(sock, { onReconnect: () => scheduleReconnect() })
 
   // Persist credentials on every update, otherwise the session dies on restart.
   sock.ev.on('creds.update', async () => {
@@ -102,12 +124,11 @@ export async function connect({ phone = null, fresh = false } = {}) {
   clearTimeout(reconnectTimer)
 
   try {
-    if (fresh && state.sock) {
-      try {
-        state.sock.end(undefined)
-      } catch {
-        /* socket already gone */
-      }
+    // Always retire the previous socket first. Without this, every failed
+    // reconnect leaves a live socket behind and each one keeps emitting
+    // "close" — a reconnect storm that gets numbers banned.
+    if (state.sock) {
+      teardown(state.sock)
       state.sock = null
     }
 
@@ -125,17 +146,46 @@ export async function connect({ phone = null, fresh = false } = {}) {
   }
 }
 
+/** Exponential backoff: 2s, 4s, 8s, 16s, 30s, 30s… with jitter. */
+export function backoffDelay(attempt = 1, jitter = Math.random()) {
+  return Math.min(MAX_BACKOFF_MS, 2000 * 2 ** Math.min(Math.max(attempt - 1, 0), 4)) + jitter * 1000
+}
+
+/**
+ * Single-flight reconnect with exponential backoff.
+ * Calling this while a timer is already pending is a no-op, which is what
+ * keeps a flapping connection from hammering WhatsApp.
+ */
+export const MAX_RECONNECT_ATTEMPTS = 12
+
 export function scheduleReconnect() {
-  clearTimeout(reconnectTimer)
+  if (reconnectTimer) return
+  if (state.reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+    state.lastError = `Gave up after ${MAX_RECONNECT_ATTEMPTS} reconnect attempts (${state.lastDisconnectCode ?? 'unknown'}).`
+    logger.error('%s Reset the session from the panel if WhatsApp logged this number out.', state.lastError)
+    setStatus('disconnected', { me: null })
+    safeEmit('session:dead', { code: state.lastDisconnectCode, reason: 'reconnect limit' })
+    return
+  }
   state.reconnectAttempts += 1
-  const wait = Math.min(MAX_BACKOFF_MS, 1000 * 2 ** Math.min(state.reconnectAttempts, 5)) + Math.random() * 1000
+  const wait = backoffDelay(state.reconnectAttempts)
   logger.warn('reconnecting in %ss (attempt %d)', Math.round(wait / 1000), state.reconnectAttempts)
-  reconnectTimer = setTimeout(() => connect(), wait)
+  reconnectTimer = setTimeout(() => {
+    reconnectTimer = null
+    connect()
+  }, wait)
+}
+
+/** Cancel any pending reconnect (used by logout and by disconnect). */
+export function cancelReconnect() {
+  clearTimeout(reconnectTimer)
+  reconnectTimer = null
 }
 
 /** Graceful shutdown — close the socket so WhatsApp doesn't hold a zombie session. */
 export async function disconnect() {
-  clearTimeout(reconnectTimer)
+  cancelReconnect()
+  state.reconnectAttempts = 0
   try {
     state.sock?.end(undefined)
   } catch {

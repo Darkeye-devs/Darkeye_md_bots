@@ -1,0 +1,44 @@
+# ───────────────────────────────────────────────
+#  Dark Eyes — Render Blueprint
+#  Deploy → https://render.com/deploy?repo=https://github.com/Darkeye-devs/Darkeye_md_bots
+#
+#  You only fill in TWO secrets: SESSION_ID and OWNER_NUMBER.
+#  No persistent disk is required, because SESSION_ID rebuilds the auth folder
+#  on every boot.
+# ───────────────────────────────────────────────
+services:
+  - type: web
+    name: dark-eyes-bot
+    runtime: node
+    plan: starter          # free instances sleep after 15 min of inactivity
+    region: frankfurt
+    buildCommand: npm install
+    startCommand: node src/index.js
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 20.20.2
+      # ── the two things a user must supply ──
+      - key: SESSION_ID
+        sync: false
+      - key: OWNER_NUMBER
+        sync: false
+      # ── sane defaults ──
+      - key: BOT_NAME
+        value: Dark Eyes
+      - key: BOT_OWNER
+        sync: false
+      - key: PREFIX
+        value: .
+      - key: BOT_MODE
+        value: public
+      - key: TZ
+        value: Africa/Lagos
+      - key: NODE_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: info
+      # ── panel lock (auto-generated secret) ──
+      - key: PANEL_TOKEN
+        generateValue: true

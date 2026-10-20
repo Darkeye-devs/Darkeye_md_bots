@@ -2,7 +2,7 @@
 
 Auto-generated from the live registry on 2026-10-20.
 
-**248 commands · 209 aliases · 9 categories · 18 plugin files**
+**249 commands · 211 aliases · 9 categories · 19 plugin files**
 
 Every command below is registered and has a working implementation. Aliases are listed next to their command.
 
@@ -205,7 +205,7 @@ Legend: ⭐ needs an API key · 🔧 needs ffmpeg on the host · 👑 owner only
 | `.warnings` | `.listwarn` `.warns` | See the warnings on a member | 3s |
 | `.welcome` | — | Turn welcome on or off for this group | 🛡️ 2s |
 
-## Owner (16)
+## Owner (17)
 
 | Command | Aliases | What it does | Notes |
 | --- | --- | --- | --- |
@@ -221,6 +221,7 @@ Legend: ⭐ needs an API key · 🔧 needs ffmpeg on the host · 👑 owner only
 | `.mode` | `.self` `.public` `.private` | Switch between public mode and owner-only mode | 👑 2s |
 | `.reload` | — | Reload every plugin without restarting the process | 👑 10s |
 | `.restart` | `.reboot` | Restart the process (pm2/docker will bring it back) | 👑 |
+| `.session` | `.sessionid` `.getsession` | Get your Session ID for hosting (sent to your DM only) | 👑 15s |
 | `.setbotname` | — | Change the name used in menus | 👑 3s |
 | `.setbotpp` | — | Set the bot profile picture from an image | 👑 15s |
 | `.setbotstatus` | `.setbio` | Set the WhatsApp profile status of the bot number | 👑 10s |

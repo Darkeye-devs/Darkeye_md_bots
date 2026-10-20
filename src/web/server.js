@@ -7,6 +7,7 @@ import { bus } from '../core/event-bus.js'
 import { registryStats, capabilities } from '../core/registry.js'
 import { summary } from '../services/database.js'
 import { sessionExists, pairedNumber } from '../core/auth.js'
+import { exportSession, importSession, sessionSummary } from '../core/session.js'
 import { connect, disconnect } from '../core/client.js'
 import { resetSession } from '../core/auth.js'
 import { isValidPhone, sanitizePhone } from '../lib/jid.js'
@@ -28,13 +29,20 @@ export function createServer() {
   })
 
   // ── status snapshot ────────────────────────
-  app.get('/api/status', (req, res) => {
+  app.get('/api/status', async (req, res) => {
+    let sessionMeta = null
+    try {
+      sessionMeta = await sessionSummary()
+    } catch {
+      sessionMeta = null
+    }
     res.json({
       ...snapshot(),
       stats: safe(() => summary()),
       registry: registryStats(),
       capabilities: { ...capabilities },
-      hasSession: state.hasSession ?? null
+      hasSession: state.hasSession ?? null,
+      session: sessionMeta
     })
   })
 
@@ -72,6 +80,34 @@ export function createServer() {
       res.json({ ok: true, message: 'Socket opened — the QR will appear here shortly.' })
     } catch (error) {
       res.status(500).json({ ok: false, error: 'Could not open a socket.' })
+    }
+  })
+
+  // ── session: read the exportable Session ID ─
+  app.get('/api/session', requireToken, async (req, res) => {
+    try {
+      const summary = await sessionSummary()
+      if (!summary.paired) {
+        return res.status(409).json({ ok: false, error: 'Not paired yet — pair a number first.' })
+      }
+      const sessionId = await exportSession()
+      res.json({ ok: true, sessionId, ...summary })
+    } catch (error) {
+      res.status(400).json({ ok: false, error: error.message })
+    }
+  })
+
+  // ── session: import an ID (restore on a fresh host) ──
+  app.post('/api/session', requireToken, async (req, res) => {
+    const raw = req.body?.sessionId
+    if (!raw) return res.status(400).json({ ok: false, error: 'Paste a session ID first.' })
+    try {
+      const result = await importSession(raw)
+      await disconnect()
+      await connect({ fresh: true })
+      res.json({ ok: true, ...result, message: 'Session loaded — connecting now.' })
+    } catch (error) {
+      res.status(400).json({ ok: false, error: error.message })
     }
   })
 

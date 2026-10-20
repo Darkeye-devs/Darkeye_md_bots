@@ -85,6 +85,38 @@
     </div>
   </section>
 
+  <!-- ── SESSION ID ────────────────────────── -->
+  <section id="session-card" class="card" hidden>
+    <div class="card-head">
+      <h2>Session ID <span class="tag">for hosting</span></h2>
+      <p>One string, and the bot boots already paired. Paste this into <code>SESSION_ID</code> on Render, Koyeb, Railway or any host — no QR, no persistent disk needed.</p>
+    </div>
+
+    <div class="steps">
+      <span><b>1</b> Copy the ID</span>
+      <span><b>2</b> Paste into <code>SESSION_ID</code></span>
+      <span><b>3</b> Add <code>OWNER_NUMBER</code> → deploy</span>
+    </div>
+
+    <div class="session-box">
+      <textarea id="session-id" readonly rows="4" spellcheck="false" placeholder="Generating…"></textarea>
+      <div class="session-actions">
+        <button id="btn-copy-session" class="btn btn--primary">Copy Session ID</button>
+        <button id="btn-download-session" class="btn btn--ghost">Download .txt</button>
+      </div>
+      <p class="warn-line">⚠️ This string is the keys to this WhatsApp account. Never post it, never commit it. Anyone holding it can read your chats.</p>
+    </div>
+
+    <details class="restore">
+      <summary>Already have a Session ID? Load it here</summary>
+      <div class="field" style="margin-top:12px">
+        <input id="session-input" type="text" placeholder="DarkEyes~eyJjcmVkcy5qc29u…" autocomplete="off" />
+        <button id="btn-load-session" class="btn btn--primary">Load session</button>
+      </div>
+      <p class="hint">Loading replaces the current pairing and reconnects immediately.</p>
+    </details>
+  </section>
+
   <!-- ── CAPABILITIES ─────────────────────── -->
   <section class="card card--tight">
     <div class="card-head"><h2>Capabilities</h2></div>

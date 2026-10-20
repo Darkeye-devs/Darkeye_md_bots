@@ -309,3 +309,63 @@ test('dormant command explains what is missing instead of failing silently', asy
 })
 
 test.after(() => closeDb())
+
+// ── session id ───────────────────────────────
+test('session ID round-trips through export → import', async () => {
+  const fs = await import('node:fs')
+  const path = await import('node:path')
+  const { exportSession, importSession, cleanSessionId, SESSION_PREFIX } = await import('../src/core/session.js')
+  const { config } = await import('../src/config/index.js')
+
+  // write a fake paired auth folder
+  fs.mkdirSync(config.sessionDir, { recursive: true })
+  fs.writeFileSync(
+    path.join(config.sessionDir, 'creds.json'),
+    JSON.stringify({ me: { id: '2348000000099:3@s.whatsapp.net' }, registered: true })
+  )
+  fs.writeFileSync(path.join(config.sessionDir, 'app-state-sync-key-AAAA.json'), JSON.stringify({ k: 'v' }))
+
+  const id = await exportSession()
+  assert.ok(id.startsWith(SESSION_PREFIX), 'session ID must carry the prefix')
+  assert.ok(id.length > 60)
+
+  // wipe the folder, then restore from the ID alone (this is what a host does)
+  fs.rmSync(config.sessionDir, { recursive: true, force: true })
+  const result = await importSession(id)
+  assert.equal(result.number, '2348000000099')
+  assert.ok(fs.existsSync(path.join(config.sessionDir, 'creds.json')))
+})
+
+test('a pasted session ID with quotes and newlines still loads', async () => {
+  const fs = await import('node:fs')
+  const path = await import('node:path')
+  const { exportSession, importSession, cleanSessionId } = await import('../src/core/session.js')
+  const { config } = await import('../src/config/index.js')
+
+  fs.mkdirSync(config.sessionDir, { recursive: true })
+  fs.writeFileSync(
+    path.join(config.sessionDir, 'creds.json'),
+    JSON.stringify({ me: { id: '2348000000098:1@s.whatsapp.net' } })
+  )
+
+  const id = await exportSession()
+  const messy = `  "${id.slice(0, 80)}\n${id.slice(80)}"  `
+  assert.equal(cleanSessionId(messy).length, id.length)
+  const result = await importSession(messy)
+  assert.equal(result.number, '2348000000098')
+})
+
+test('garbage session IDs are rejected with a clear error', async () => {
+  const { importSession } = await import('../src/core/session.js')
+  await assert.rejects(() => importSession('not-a-session'), /base64|JSON/i)
+  await assert.rejects(() => importSession(''), /empty/i)
+})
+
+test('export refuses an unpaired folder', async () => {
+  const fs = await import('node:fs')
+  const { exportSession } = await import('../src/core/session.js')
+  const { config } = await import('../src/config/index.js')
+  fs.rmSync(config.sessionDir, { recursive: true, force: true })
+  fs.mkdirSync(config.sessionDir, { recursive: true })
+  await assert.rejects(() => exportSession(), /pair|creds/i)
+})
