@@ -257,9 +257,13 @@ why the pairing blueprint has no session variables at all.
 
 ### The four steps
 
-1. **Deploy the pairing server**
-   <https://render.com/deploy?repo=https://github.com/Darkeye-devs/Darkeye_md_bots&blueprint=render-pairing.yaml>
-   → free plan, no secrets to fill in. Wait for `Live`.
+1. **Deploy the pairing server** — Render Dashboard → **New → Blueprint** →
+   connect `Darkeye-devs/Darkeye_md_bots` → in **Blueprint Path** enter
+   `render-pairing.yaml` (the root `render.yaml` is the per-user bot blueprint,
+   so the path has to be explicit) → **Deploy Blueprint**.
+   Free plan, no secrets to fill in. Wait for the status to say `Live`.
+   The service URL appears at the top of its page, e.g.
+   `https://dark-eyes-pairing-xxxx.onrender.com`.
 2. **Copy its URL** — looks like `https://dark-eyes-pairing-xxxx.onrender.com`.
 3. **Point the site at it** from the repo root:
 

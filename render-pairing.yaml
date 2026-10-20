@@ -1,6 +1,9 @@
 # ───────────────────────────────────────────────
 #  Dark Eyes — PAIRING SERVER blueprint
-#  Deploy → https://render.com/deploy?repo=https://github.com/Darkeye-devs/Darkeye_md_bots&blueprint=render-pairing.yaml
+#  How to deploy: Render Dashboard → New → Blueprint → connect this repo →
+#  set "Blueprint Path" to render-pairing.yaml → Deploy Blueprint.
+#  (render.yaml at the root stays the per-user BOT blueprint, so this file
+#   needs the explicit path.)
 #
 #  This is NOT the bot. It is the public backend the Vercel page talks to.
 #  Its only job: hand out pairing codes / QR codes, and return the Session ID
