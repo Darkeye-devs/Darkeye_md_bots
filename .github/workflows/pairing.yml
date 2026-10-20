@@ -1,0 +1,76 @@
+# ───────────────────────────────────────────────
+#  EXPERIMENTAL — pairing backend on GitHub Actions + a fixed ngrok URL
+#
+#  A GitHub runner has no inbound port, so the Vercel page cannot reach it
+#  directly. The trick is a free ngrok account with one *static* domain, which
+#  keeps the same https URL across runs — so the site stays pointed at it.
+#
+#  Read docs/GITHUB-ACTIONS.md first. This is a demo-grade setup: the tunnel
+#  disappears for a few seconds to minutes every ~5 hours while the job
+#  restarts.
+#
+#  Secrets:  NGROK_AUTHTOKEN
+#  Vars:     NGROK_DOMAIN   e.g. dark-eyes-pair.ngrok-free.app (no https://)
+# ───────────────────────────────────────────────
+name: Dark Eyes pairing (experimental)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */5 * * *'
+
+concurrency:
+  group: dark-eyes-pairing
+  cancel-in-progress: true
+
+jobs:
+  pairing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install ffmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Install ngrok
+        run: |
+          curl -fsSL https://ngrok-agent.s3.amazonaws.com/ngrok.asc \
+            | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
+          echo "deb https://ngrok-agent.s3.amazonaws.com buster main" \
+            | sudo tee /etc/apt/sources.list.d/ngrok.list >/dev/null
+          sudo apt-get update -qq && sudo apt-get install -y -qq ngrok
+
+      - name: Start the pairing backend
+        env:
+          PORT: 3000
+          NODE_ENV: production
+          LOG_LEVEL: info
+          TZ: Africa/Lagos
+          # Leave SESSION_ID and OWNER_NUMBER unset: a pairing server must stay
+          # unlinked, otherwise it answers 409 "This bot is already linked".
+          CORS_ORIGINS: ${{ vars.SITE_ORIGIN || '*' }}
+        run: |
+          node src/index.js &
+          BACKEND=$!
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:3000/api/health && break
+            sleep 2
+          done
+
+          ngrok config add-authtoken "${{ secrets.NGROK_AUTHTOKEN }}"
+          ngrok http --url="${{ vars.NGROK_DOMAIN }}" 3000 --log=stdout &
+          TUNNEL=$!
+
+          echo "::notice::Pairing backend live at https://${{ vars.NGROK_DOMAIN }}"
+          # Stay up until GitHub kills the job; keep the log flowing for debugging.
+          while kill -0 "$BACKEND" 2>/dev/null; do sleep 30; done
+          kill "$TUNNEL" 2>/dev/null || true

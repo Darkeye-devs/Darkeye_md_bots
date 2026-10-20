@@ -154,7 +154,9 @@ function alertBox(kind, html) {
 
 async function call(path, options = {}) {
   const res = await fetch(`${API}${path}`, {
-    headers: { 'content-type': 'application/json' },
+    // ngrok-skip-browser-warning keeps free ngrok tunnels from returning their
+    // HTML interstitial instead of JSON. Harmless on Render/Zeabur/any host.
+    headers: { 'content-type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
     ...options
   })
   const data = await res.json().catch(() => ({}))
@@ -424,7 +426,7 @@ async function boot() {
   }
 
   // Wake the backend early — free hosts cold-start slowly.
-  fetch(`${API}/api/health`).catch(() => {})
+  fetch(`${API}/api/health`, { headers: { 'ngrok-skip-browser-warning': 'true' } }).catch(() => {})
 
   $('#go').addEventListener('click', requestCode)
   $('#phone').addEventListener('keydown', (event) => {

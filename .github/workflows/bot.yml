@@ -1,0 +1,67 @@
+# ───────────────────────────────────────────────
+#  Run the Dark Eyes bot on GitHub Actions
+#
+#  Why this exists: it is the only option that needs no card, no signup and no
+#  money. It is also the *least* reliable way to run a WhatsApp bot, so read
+#  docs/GITHUB-ACTIONS.md before relying on it.
+#
+#  How the restart works:
+#    GitHub-hosted jobs are killed at 6 hours. This fires every 5 hours and
+#    cancels the previous run (concurrency), so there is always exactly one
+#    bot connected. A 10-minute gap risk exists if GitHub delays the schedule —
+#    scheduled runs are best-effort, not guaranteed.
+# ───────────────────────────────────────────────
+name: Dark Eyes bot
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */5 * * *' # every 5 hours, in UTC
+
+# Never allow two bots to hold the same WhatsApp session at once.
+concurrency:
+  group: dark-eyes-bot
+  cancel-in-progress: true
+
+jobs:
+  bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350 # must stay under GitHub's 360-minute cap
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install ffmpeg (needed by the sticker commands)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Start the bot
+        env:
+          SESSION_ID: ${{ secrets.SESSION_ID }}
+          OWNER_NUMBER: ${{ secrets.OWNER_NUMBER }}
+          BOT_NAME: ${{ vars.BOT_NAME || 'Dark Eyes' }}
+          PREFIX: '.'
+          BOT_MODE: public
+          TZ: Africa/Lagos
+          NODE_ENV: production
+          LOG_LEVEL: info
+          # Optional: set these as repository secrets to enable AI + downloads.
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
+          AI_MODEL: ${{ secrets.AI_MODEL }}
+        run: node src/index.js
+
+      - name: Explain the failure
+        if: failure()
+        run: |
+          echo "::notice::The bot stopped early. The usual causes:"
+          echo "  • SESSION_ID secret missing or expired (pair again)"
+          echo "  • OWNER_NUMBER not set"
+          echo "  • someone else is logged into the same WhatsApp session"
+          echo "  • GitHub cancelled the job at the 6-hour limit (expected)"
