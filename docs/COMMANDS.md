@@ -2,13 +2,13 @@
 
 Auto-generated from the live registry on 2026-10-20.
 
-**249 commands · 211 aliases · 9 categories · 19 plugin files**
+**297 commands · 270 aliases · 10 categories · 23 plugin files**
 
 Every command below is registered and has a working implementation. Aliases are listed next to their command.
 
 Legend: ⭐ needs an API key · 🔧 needs ffmpeg on the host · 👑 owner only · 🛡️ group admin only
 
-## Fun (54)
+## Fun (65)
 
 | Command | Aliases | What it does | Notes |
 | --- | --- | --- | --- |
@@ -28,23 +28,32 @@ Legend: ⭐ needs an API key · 🔧 needs ffmpeg on the host · 👑 owner only
 | `.dice` | `.roll` `.roll20` | Roll dice (1d6 by default, or NdM) | 1s |
 | `.drink` | — | 🍹 drinks with someone | 3s |
 | `.eat` | — | 🍽️ eats with someone | 3s |
-| `.fact` | `.funfact` `.didyouknow` | A random real fact | 2s |
+| `.endgame` | `.stopplay` `.giveup` | End the game you are playing and reveal the answer | 2s |
+| `.fact` | `.funfact` `.didyouknow` | A random real fact (uselessfacts API) | 2s |
 | `.fortune` | `.tarot` | A cryptic fortune | 2s |
+| `.guesscapital` | — | Name the capital city of a country (live country data) | 4s |
+| `.guesscountry` | — | Guess the country from its capital (live country data) | 4s |
+| `.guessflag` | `.flagquiz` | Guess the country from its flag | 4s |
 | `.guessnumber` | `.guessnum` | Guess my number between 1 and 100 (10 tries) | 5s |
+| `.guessword` | `.scramble` | Unscramble a word | 4s |
 | `.handhold` | — | 🤝 holds hands with someone | 3s |
+| `.hangman` | `.hang` | Play hangman (6 wrong guesses) | 5s |
 | `.happy` | — | 😄 is happy with someone | 3s |
 | `.highfive` | — | 🙌 high-fives someone | 3s |
-| `.joke` | `.dadjoke` `.pun` | A joke (real joke API with a local fallback) | 2s |
+| `.joke` | `.dadjoke` `.pun` | A joke from a real joke API (icanhazdadjoke / official-joke-api) | 2s |
 | `.laugh` | — | 😂 laughs with someone | 3s |
 | `.lick` | — | 👅 licks someone | 3s |
+| `.mathquiz` | `.mathsquiz` `.quizmath` | Solve a random arithmetic problem | 3s |
+| `.neverhaveiever` | `.nhie` | Never have I ever prompt | 3s |
 | `.nod` | — | 🙂 nods at someone | 3s |
 | `.nom` | — | 😋 noms with someone | 3s |
 | `.pat` | — | 🫳 pats someone | 3s |
 | `.poke` | — | 👉 pokes someone | 3s |
 | `.pout` | — | 😤 pouts at someone | 3s |
 | `.punch` | — | 👊 punches someone | 3s |
-| `.quote` | — | A quote worth reading | 2s |
+| `.quote` | — | A quote with its author (zenquotes API) | 2s |
 | `.rate` | `.iq` `.howgay` | Rate something on a scale of 1 to 100 | 2s |
+| `.riddle` | `.riddles` | A riddle to solve | 4s |
 | `.rps` | `.rockpaperscissors` | Rock, paper, scissors against the bot | 2s |
 | `.sad` | — | 😔 is sad with someone | 3s |
 | `.scared` | — | 😨 is scared of someone | 3s |
@@ -60,12 +69,82 @@ Legend: ⭐ needs an API key · 🔧 needs ffmpeg on the host · 👑 owner only
 | `.think` | — | 🤔 thinks about someone | 3s |
 | `.tickle` | — | 🪶 tickles someone | 3s |
 | `.tictactoe` | `.ttt` | Play tic-tac-toe against an unbeatable bot | 5s |
-| `.trivia` | `.quiz` | Answer a trivia question (60 seconds) | 5s |
+| `.trivia` | `.quiz` | Answer a live trivia question from opentdb (60 seconds) | 5s |
 | `.truth` | `.dare` `.truthordare` | Truth or dare prompt | 2s |
 | `.wave` | — | 👋 waves at someone | 3s |
 | `.wink` | — | 😉 winks at someone | 3s |
+| `.wordchain` | `.chainword` | Word chain — last letter becomes the first letter | 3s |
+| `.wordle` | `.wordlegame` | Guess the 5-letter word in 6 tries | 5s |
 | `.wyr` | `.wouldyourather` | Would you rather… | 2s |
 | `.yawn` | — | 🥱 yawns at someone | 3s |
+
+## Tools (63)
+
+| Command | Aliases | What it does | Notes |
+| --- | --- | --- | --- |
+| `.antonym` | `.ant` | Antonyms for a word (Datamuse) | 2s |
+| `.area` | — | Convert areas (m², km², ha, ft², acre, mi²) | 1s |
+| `.atbash` | — | Atbash cipher (A↔Z, B↔Y …) | 2s |
+| `.base` | `.radix` `.baseten` | Convert a number between bases (2–36) | 1s |
+| `.base64` | `.b64` | Encode or decode Base64 | 2s |
+| `.binary` | `.bin` | Text ↔ binary | 2s |
+| `.bmi` | — | Body mass index | 3s |
+| `.caesar` | — | Caesar cipher with a custom shift | 2s |
+| `.calc` | `.calculate` `.math` | Do maths safely (no eval, real expression parser) | 2s |
+| `.convert` | `.unit` `.units` `.conv` | Convert between units (length, mass, volume, area, data, speed, temperature) | 2s |
+| `.count` | `.wordcount` `.wc` | Count characters, words, lines and reading time | 2s |
+| `.country` | `.countryinfo` | Capital, currency and population of a country | 2s |
+| `.crypto` | `.cryptoprice` `.coinprice` | Live crypto prices (CoinGecko, no key needed) | 5s |
+| `.currency` | `.exchange` `.forex` | Live currency conversion (free rate feed, no key) | 5s |
+| `.data` | `.datasize` `.bytes` | Convert data sizes (B, KB, MB, GB, TB, kbit…) | 1s |
+| `.dec2hex` | — | Decimal to hexadecimal | 1s |
+| `.decimal` | `.bin2dec` `.dec2bin` | Binary ↔ decimal (0/1 input is read as binary, anything else as decimal) | 1s |
+| `.define` | `.dictionary` `.meaning` `.dict` | Dictionary definition with real examples | 4s |
+| `.dns` | `.dnslookup` | Resolve DNS records for a domain | 4s |
+| `.earthquake` | `.quake` `.quakes` | Significant earthquakes this week (USGS) | 10s |
+| `.github` | `.gh` `.repoinfo` | GitHub repository stats | 3s |
+| `.hash` | `.md5` `.sha256` | Hash text (md5, sha1, sha256, sha512) | 2s |
+| `.hex` | — | Text ↔ hexadecimal | 2s |
+| `.hex2dec` | — | Hexadecimal to decimal | 1s |
+| `.ip` | `.ipinfo` `.whoisip` | Look up the location and network of an IP address | 4s |
+| `.langdetect` | `.language` `.detectlang` | Guess the language of a piece of text | 3s |
+| `.length` | `.len` | Convert lengths (mm, cm, m, km, in, ft, yd, mi, nmi) | 1s |
+| `.lorem` | `.loremipsum` | Generate placeholder text | 2s |
+| `.lower` | `.lowercase` | quiet the text | 2s |
+| `.octal` | — | Octal ↔ decimal (digits 0-7 are read as octal when they contain no 8 or 9) | 1s |
+| `.password` | `.passgen` `.genpass` | Generate a strong password (real entropy, not a wordlist) | 3s |
+| `.passwordcheck` | `.passstrength` | Estimate how strong a password is | 3s |
+| `.pronounce` | `.phonetic` `.ipa` | IPA pronunciation for a word (Wiktionary) | 2s |
+| `.qr` | `.qrcode` `.qrgen` | Turn any text or link into a QR code image | 3s |
+| `.rates` | `.exchangerates` | Exchange rates for a base currency | 6s |
+| `.readmore` | — | Hide everything after a "read more" break | 2s |
+| `.reverse` | — | Reverse text character by character | 2s |
+| `.rhyme` | `.rhymes` | Words that rhyme (Datamuse) | 2s |
+| `.roman` | `.romannumeral` | Numbers ↔ Roman numerals (1–3999) | 2s |
+| `.rot13` | — | ROT13 cipher | 2s |
+| `.search` | `.google` `.ddg` `.duckduckgo` | Instant answer search (DuckDuckGo) | 3s |
+| `.shorturl` | `.shorten` `.tinyurl` | Shorten a long link (is.gd, free, no key) | 4s |
+| `.speed-convert` | `.speedc` | Convert speeds (m/s, km/h, mph, knots, ft/s) | 1s |
+| `.spoiler` | — | Wrap text in a WhatsApp spoiler | 2s |
+| `.synonym` | `.syn` | Synonyms for a word (Datamuse) | 2s |
+| `.temperature` | `.temp` | Quick temperature conversion | 2s |
+| `.textmaker` | `.tm` `.textimg` | Render text as a styled image (works offline, no API key) | 6s |
+| `.thesaurus` | `.meanslike` | Words with a similar meaning (Datamuse) | 2s |
+| `.time-convert` | `.timec` | Convert time spans (ms, s, min, h, d, wk, mo, y) | 1s |
+| `.title` | `.titlecase` | Capitalise Each Word | 2s |
+| `.translate` | `.tr` | Translate text (free endpoint; or your AI model if configured) | 4s |
+| `.upper` | `.uppercase` | SHOUT THE TEXT | 2s |
+| `.urban` | `.urbandict` `.slang` `.ud` | Urban Dictionary definition | 3s |
+| `.uuid` | `.guid` | Generate a UUID v4 | 1s |
+| `.volume` | `.vol` | Convert volumes (ml, l, tsp, tbsp, cup, pt, qt, gal) | 1s |
+| `.weather` | `.forecast` `.climate` | Live weather and a 3-day forecast (Open-Meteo, no key) | 5s |
+| `.weight` | `.mass` | Convert weights (mg, g, kg, t, oz, lb, st) | 1s |
+| `.whois` | `.domain` `.domaininfo` | Domain registration info via RDAP (the modern whois) | 6s |
+| `.wikipedia` | `.wiki` `.w` | Wikipedia summary for a topic | 3s |
+| `.wikiquote` | `.wquote` | Wikiquote summary for a person or topic | 3s |
+| `.wikisearch` | `.wikis` `.wikiarticles` | Search Wikipedia and list matching articles | 3s |
+| `.words` | `.number2words` `.towords` | Turn a number into English words | 2s |
+| `.worldtime` | `.timezone` | Current time in any city timezone | 3s |
 
 ## Media (50)
 
@@ -121,49 +200,6 @@ Legend: ⭐ needs an API key · 🔧 needs ffmpeg on the host · 👑 owner only
 | `.ytmp3` | `.ytaudio` `.music` | Download the audio of a YouTube video | 20s |
 | `.ytmp4` | `.ytvideo` `.yt` | Download a YouTube video | 20s |
 | `.ytshort` | — | Download a YouTube video | 20s |
-
-## Tools (38)
-
-| Command | Aliases | What it does | Notes |
-| --- | --- | --- | --- |
-| `.atbash` | — | Atbash cipher (A↔Z, B↔Y …) | 2s |
-| `.base64` | `.b64` | Encode or decode Base64 | 2s |
-| `.binary` | `.bin` | Text ↔ binary | 2s |
-| `.bmi` | — | Body mass index | 3s |
-| `.caesar` | — | Caesar cipher with a custom shift | 2s |
-| `.calc` | `.calculate` `.math` | Do maths safely (no eval, real expression parser) | 2s |
-| `.convert` | `.unit` `.units` `.conv` | Convert between units (length, mass, volume, area, data, speed, temperature) | 2s |
-| `.count` | `.wordcount` `.wc` | Count characters, words, lines and reading time | 2s |
-| `.crypto` | `.cryptoprice` `.coinprice` | Live crypto prices (CoinGecko, no key needed) | 5s |
-| `.currency` | `.exchange` `.forex` | Live currency conversion (free rate feed, no key) | 5s |
-| `.define` | `.dictionary` `.meaning` `.dict` | Dictionary definition with real examples | 4s |
-| `.dns` | `.dnslookup` | Resolve DNS records for a domain | 4s |
-| `.hash` | `.md5` `.sha256` | Hash text (md5, sha1, sha256, sha512) | 2s |
-| `.hex` | — | Text ↔ hexadecimal | 2s |
-| `.ip` | `.ipinfo` `.whoisip` | Look up the location and network of an IP address | 4s |
-| `.langdetect` | `.language` `.detectlang` | Guess the language of a piece of text | 3s |
-| `.lorem` | `.loremipsum` | Generate placeholder text | 2s |
-| `.lower` | `.lowercase` | quiet the text | 2s |
-| `.password` | `.passgen` `.genpass` | Generate a strong password (real entropy, not a wordlist) | 3s |
-| `.passwordcheck` | `.passstrength` | Estimate how strong a password is | 3s |
-| `.qr` | `.qrcode` `.qrgen` | Turn any text or link into a QR code image | 3s |
-| `.rates` | `.exchangerates` | Exchange rates for a base currency | 6s |
-| `.readmore` | — | Hide everything after a "read more" break | 2s |
-| `.reverse` | — | Reverse text character by character | 2s |
-| `.roman` | `.romannumeral` | Numbers ↔ Roman numerals (1–3999) | 2s |
-| `.rot13` | — | ROT13 cipher | 2s |
-| `.shorturl` | `.shorten` `.tinyurl` | Shorten a long link (is.gd, free, no key) | 4s |
-| `.spoiler` | — | Wrap text in a WhatsApp spoiler | 2s |
-| `.temperature` | `.temp` | Quick temperature conversion | 2s |
-| `.textmaker` | `.tm` `.textimg` | Render text as a styled image (works offline, no API key) | 6s |
-| `.title` | `.titlecase` | Capitalise Each Word | 2s |
-| `.translate` | `.tr` | Translate text (free endpoint; or your AI model if configured) | 4s |
-| `.upper` | `.uppercase` | SHOUT THE TEXT | 2s |
-| `.uuid` | `.guid` | Generate a UUID v4 | 1s |
-| `.weather` | `.forecast` `.climate` | Live weather and a 3-day forecast (Open-Meteo, no key) | 5s |
-| `.whois` | `.domain` `.domaininfo` | Domain registration info via RDAP (the modern whois) | 6s |
-| `.words` | `.number2words` `.towords` | Turn a number into English words | 2s |
-| `.worldtime` | `.timezone` | Current time in any city timezone | 3s |
 
 ## Moderation (35)
 
@@ -264,6 +300,23 @@ Legend: ⭐ needs an API key · 🔧 needs ffmpeg on the host · 👑 owner only
 | `.rob` | `.steal` | Try to rob someone (risky — 15 min cooldown) | 3s |
 | `.shop` | `.store` | Items you can buy | 3s |
 | `.work` | `.job` | Work for coins (45 min cooldown) | 2s |
+
+## Anime (12)
+
+| Command | Aliases | What it does | Notes |
+| --- | --- | --- | --- |
+| `.anime` | `.animesearch` `.anilist` `.mal` `.myanimelist` | Search anime on AniList | 3s |
+| `.animechar` | `.character` `.animecharacter` | Look up an anime character | 3s |
+| `.animeinfo` | `.animeid` | Full details for one anime (title or AniList id) | 3s |
+| `.animequote` | `.aniquote` | A random anime quote (animechan API, with attribution) | 3s |
+| `.awoo` | `.animehug` `.animepat` | An anime reaction GIF (nekos.best) | 3s |
+| `.husbando` | — | Send a random husbando image (nekos.best) | 3s |
+| `.kemonomimi` | — | Send a random kemonomimi image (nekos.best) | 3s |
+| `.manga` | `.mangasearch` `.manhwa` `.manhua` | Search manga / manhwa / manhua on AniList | 3s |
+| `.mangainfo` | — | Full details for one manga (title or AniList id) | 3s |
+| `.neko` | — | Send a random neko image (nekos.best) | 3s |
+| `.trendinganime` | `.animetrending` `.airing` | What is trending on AniList right now | 5s |
+| `.waifu` | — | Send a random waifu image (nekos.best) | 3s |
 
 ## General (11)
 

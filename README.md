@@ -24,9 +24,9 @@
 
 <br/>
 
-<img src="https://img.shields.io/badge/COMMANDS-249-22D3EE?style=flat-square&labelColor=0b0f16" />
-<img src="https://img.shields.io/badge/ALIASES-211-8B5CF6?style=flat-square&labelColor=0b0f16" />
-<img src="https://img.shields.io/badge/TESTS-81%20passing-34D399?style=flat-square&labelColor=0b0f16" />
+<img src="https://img.shields.io/badge/COMMANDS-297-22D3EE?style=flat-square&labelColor=0b0f16" />
+<img src="https://img.shields.io/badge/ALIASES-270-8B5CF6?style=flat-square&labelColor=0b0f16" />
+<img src="https://img.shields.io/badge/TESTS-112%20passing-34D399?style=flat-square&labelColor=0b0f16" />
 <img src="https://img.shields.io/badge/LOAD%20FAILURES-0-F472B6?style=flat-square&labelColor=0b0f16" />
 <img src="https://img.shields.io/badge/NODE-20%2B-339933?style=flat-square&logo=node.js&logoColor=white&labelColor=0b0f16" />
 <img src="https://img.shields.io/badge/LICENSE-MIT-22D3EE?style=flat-square&labelColor=0b0f16" />
@@ -45,7 +45,7 @@ Most bot repos advertise *"1000+ commands"* and quietly ship a few hundred alias
 
 > **A command only exists if it has working code behind it.**
 
-That rule is not a slogan — it is enforced by the loader, measured by an audit script, and proven by 81 tests that execute the real command functions.
+That rule is not a slogan — it is enforced by the loader, measured by an audit script, and proven by 112 tests that execute the real command functions.
 
 <br/>
 
@@ -147,8 +147,9 @@ from the command line with `npm run deploy:vercel` (needs `VERCEL_TOKEN`).
 Full walkthrough — env vars, CLI commands, CORS gotchas, troubleshooting:
 **[docs/VERCEL-SPLIT.md](docs/VERCEL-SPLIT.md)**
 
-Every data command calls a real API — the full list, with which ones need a
-key and which are free: **[docs/APIS.md](docs/APIS.md)**
+Every data command calls a real API — the full list, which ones need a key,
+which are free, and the games that are computed locally:
+**[docs/APIS.md](docs/APIS.md)**
 
 > [!WARNING]
 > **Free tiers sleep.** Render's free web service idles out after ~15 minutes, and a sleeping bot cannot answer WhatsApp messages. Ping `/api/health` every 5 minutes with a free uptime monitor, or take the Starter plan (~$7/month) for 24/7.
@@ -196,7 +197,7 @@ Audited against the popular 1,000-command list:
 | Reachable through an alias | 116 |
 | Covered by an equivalent command | 73 |
 | Not built — each with a written reason | 598 |
-| **Live commands we ship** | **249** (+211 aliases) |
+| **Live commands we ship** | **297** (+270 aliases) |
 | **Commands we built that are not on that list** | **36** |
 
 The 598 gaps are documented, not hidden: DRM-protected music downloads, paid image APIs, social "stalk" endpoints, and game engines that were not built yet. → [`docs/AUDIT.md`](docs/AUDIT.md)

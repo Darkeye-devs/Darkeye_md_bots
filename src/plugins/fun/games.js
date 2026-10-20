@@ -1,4 +1,5 @@
 import { UserError } from '../../lib/errors.js'
+import { gradeGuess } from '../../core/quiz.js'
 import { bold, pick } from '../../lib/text.js'
 import { hashString } from '../../lib/text.js'
 
@@ -177,7 +178,11 @@ export default [
     async execute(ctx) {
       const key = sessionKey(ctx)
       const session = sessions.get(key)
-      if (session?.type !== 'guess') throw new UserError('No guessing game is running. Start one with .guessnumber.')
+      if (session?.type !== 'guess') {
+        // Not the number game? Hand the input to the quiz grader, which owns
+        // hangman, wordle, scramble, maths, geography, riddles and word chain.
+        return gradeGuess(ctx, ctx.argsText)
+      }
 
       const guess = Number.parseInt(ctx.argsText, 10)
       if (!Number.isFinite(guess)) throw new UserError('Type a number.')

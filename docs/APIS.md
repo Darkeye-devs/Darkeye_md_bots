@@ -70,3 +70,38 @@ Rules of the house:
 1. No key required unless there is genuinely no alternative — then document it here.
 2. No hardcoded data lists for anything that exists as an API.
 3. On failure, throw a `UserError` with a human message. Never invent a result.
+
+## Wave 2 additions (anime, knowledge, games)
+
+| Service | Endpoint | Key? | Used by |
+| --- | --- | --- | --- |
+| AniList | `graphql.anilist.co` | **no** | `.anime`, `.animeinfo`, `.manga`, `.mangainfo`, `.trendinganime`, `.animechar` |
+| AniChan | `api.animechan.io/v1/quotes/random` | **no** | `.animequote` |
+| nekos.best | `nekos.best/api/v2/*` | **no** | `.waifu`, `.neko`, `.husbando`, `.kemonomimi`, `.awoo` |
+| Wikipedia | `en.wikipedia.org/api/rest_v1` + `w/api.php` | **no** | `.wiki`, `.wikisearch` |
+| Wikiquote | `en.wikiquote.org/api/rest_v1` | **no** | `.wikiquote` |
+| Urban Dictionary | `api.urbandictionary.com/v0/define` | **no** | `.urban` |
+| Datamuse | `api.datamuse.com/words` | **no** | `.synonym`, `.antonym`, `.rhyme`, `.thesaurus` |
+| DuckDuckGo | `api.duckduckgo.com` | **no** | `.search` |
+| Wiktionary | `en.wiktionary.org/w/api.php` (wikitext IPA) | **no** | `.pronounce` |
+| countriesnow | `countriesnow.space/api/v0.1` | **no** | `.country`, `.guesscapital`, `.guesscountry`, `.guessflag` |
+| flagcdn | `flagcdn.com` | **no** | `.guessflag` |
+| GitHub | `api.github.com` | **no** | `.github` (60 req/hour unauthenticated) |
+| USGS | `earthquake.usgs.gov` | **no** | `.earthquake` |
+| random-word-api | `random-word-api.herokuapp.com` | **no** | `.hangman`, `.wordle`, `.scramble`, `.wordchain` (bundled fallback, labelled) |
+| riddles-api | `riddles-api.vercel.app` | **no** | `.riddle` |
+
+Unit conversions (`.length`, `.weight`, `.speed-convert`, `.area`, `.volume`,
+`.time-convert`, `.data`, `.base`, `.hex2dec`, `.dec2hex`, `.decimal`,
+`.octal`) are pure arithmetic — no network, no lookup table of answers.
+
+### Two bugs this wave shook out
+
+1. **Duplicate module instances.** The plugin loader imports every plugin with
+   `?v=<timestamp>`, so a module that is *both* a plugin and imported by another
+   plugin exists twice, with two separate Maps. Game state now lives in
+   `src/core/quiz.js` (not a plugin file), so `.hangman` and `.guess` always see
+   the same store.
+2. **Unbounded Wikipedia fallback.** A 404 triggers a search-and-retry, and that
+   page could 404 too. `wikipedia()` now takes a `depth` guard and refuses to
+   recurse more than once.

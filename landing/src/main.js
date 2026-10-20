@@ -58,13 +58,13 @@ app.innerHTML = `
     <img class="banner" src="./banner.png" alt="Dark Eyes" />
     <h1><span class="grad">PAIR. DEPLOY. DONE.</span></h1>
     <p class="sub">
-      A WhatsApp MD bot with 249 commands that actually run. Pair your number here,
+      A WhatsApp MD bot with 297 commands that actually run. Pair your number here,
       get your Session ID, paste two values into Render — and it is live.
     </p>
     <div class="chips">
-      <span class="chip"><b>249</b> commands</span>
-      <span class="chip"><b>211</b> aliases</span>
-      <span class="chip"><b>81</b> tests passing</span>
+      <span class="chip"><b>297</b> commands</span>
+      <span class="chip"><b>270</b> aliases</span>
+      <span class="chip"><b>112</b> tests passing</span>
       <span class="chip"><b>0</b> fake features</span>
       <span class="chip"><b>2</b> values to deploy</span>
     </div>
@@ -102,7 +102,7 @@ app.innerHTML = `
 
   <div class="grid3" id="why">
     <div class="tile">
-      <span class="num">249</span>
+      <span class="num">297</span>
       <h3>Commands that work</h3>
       <p>Every command has a real implementation and a behavioural test. No placeholders, no "coming soon".</p>
     </div>

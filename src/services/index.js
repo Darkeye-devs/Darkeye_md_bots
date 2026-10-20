@@ -6,6 +6,9 @@ import textmaker from './textmaker.js'
 import * as scheduler from './scheduler.js'
 import * as economy from './economy.js'
 import * as content from './content.js'
+import * as anilist from './anilist.js'
+import * as lookup from './lookup.js'
+import * as words from './words.js'
 import { capabilities } from '../core/registry.js'
 
 /**
@@ -22,6 +25,9 @@ export const services = {
   scheduler,
   economy,
   content,
+  anilist,
+  lookup,
+  words,
   capabilities
 }
 

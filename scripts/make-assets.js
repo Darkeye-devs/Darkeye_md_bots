@@ -124,7 +124,7 @@ const banner = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H
 
   <!-- proof line -->
   <text x="640" y="352" text-anchor="middle" font-family="JetBrains Mono" font-weight="500"
-        font-size="17" fill="#c7d2fe">249 commands · 211 aliases · 81 tests · 0 fake features</text>
+        font-size="17" fill="#c7d2fe">297 commands · 270 aliases · 112 tests · 0 fake features</text>
 
   <!-- corner chips -->
   <text x="34" y="52" font-family="JetBrains Mono" font-size="13" fill="${C.violet}" opacity="0.85">v1.0</text>
